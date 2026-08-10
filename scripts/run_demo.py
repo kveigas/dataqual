@@ -62,6 +62,7 @@ def main():
     from dataqual.descriptive import DescriptiveQueries
 
     queries = DescriptiveQueries(repo)
+    assert record.dataset_id is not None
     summary = queries.summary(record.dataset_id)
     if summary:
         print(

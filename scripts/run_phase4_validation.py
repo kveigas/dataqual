@@ -429,20 +429,23 @@ def run_real_benchmark_descriptive_analysis(data_root: Path) -> dict[str, Any]:
     ]
 
     gold_raw = pq.read_table(path / "gold_labels.parquet").to_pylist()
-    gold_labels = [
-        GoldLabel(
-            gold_label_id=str(r.get("gold_label_id") or f"g-{r['item_id']}"),
-            project_id="reqp3",
-            item_id=str(r["item_id"]),
-            label_domain_id="reqp3_labels",
-            label=str(r["label"]) if r.get("label") else None,
-            resolution_status=str(r["resolution_status"]),
-            gold_source="benchmark_truth",
-            version=1,
-            created_at=str(r.get("created_at") or "2026-08-09T00:00:00Z"),
+    gold_labels: list[GoldLabel] = []
+    for r in gold_raw:
+        res_status = str(r["resolution_status"])
+        assert res_status in ("resolved_hard", "resolved_distributional", "unresolved")
+        gold_labels.append(
+            GoldLabel(
+                gold_label_id=str(r.get("gold_label_id") or f"g-{r['item_id']}"),
+                project_id="reqp3",
+                item_id=str(r["item_id"]),
+                label_domain_id="reqp3_labels",
+                label=str(r["label"]) if r.get("label") else None,
+                resolution_status=res_status,
+                gold_source="benchmark_truth",
+                version=1,
+                created_at=str(r.get("created_at") or "2026-08-09T00:00:00Z"),
+            )
         )
-        for r in gold_raw
-    ]
 
     intel_svc = AnnotatorIntelligenceService(annotations, gold_labels, labels)
     profiles = intel_svc.list_annotator_profiles()
