@@ -1,11 +1,7 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
-import typer
 
-from dataqual.api import create_app
-from dataqual.config import Settings
 from dataqual.ingestion import ImportService
 from dataqual.schemas.imports import ImportConfig
 from dataqual.simulation import SyntheticDatasetGenerator
@@ -25,10 +21,14 @@ def main():
     print("\n1. Generating synthetic demo dataset (Scenario S12 - Mixed Realistic World)...")
     cfg = get_pre_registered_scenario_config("S12", world_seed=42, random_ranking_seed=2026)
     gen = SyntheticDatasetGenerator(cfg)
-    annos, golds, hidden_truth = gen.generate()
+    annos, _golds, hidden_truth = gen.generate()
 
-    print(f"   Generated {len(annos)} annotation events on {len(hidden_truth.items_truth)} items across {len(hidden_truth.worker_parameters)} workers.")
-    print(f"   Hidden Ground Truth: {hidden_truth.total_true_annotation_defects} true annotation defects, {hidden_truth.total_ambiguous_items} ambiguous items.")
+    print(
+        f"   Generated {len(annos)} annotation events on {len(hidden_truth.items_truth)} items across {len(hidden_truth.worker_parameters)} workers."
+    )
+    print(
+        f"   Hidden Ground Truth: {hidden_truth.total_true_annotation_defects} true annotation defects, {hidden_truth.total_ambiguous_items} ambiguous items."
+    )
 
     # 2. Ingest via ImportService
     print("\n2. Ingesting canonical dataset snapshot into DataQual storage foundation...")
@@ -60,11 +60,16 @@ def main():
     # 3. Print Summary Evidence
     print("\n3. Verifying evidence overview & agreement...")
     from dataqual.descriptive import DescriptiveQueries
+
     queries = DescriptiveQueries(repo)
     summary = queries.summary(record.dataset_id)
     if summary:
-        print(f"   Items: {summary.unique_items} | Annotations: {summary.current_annotation_events} | Annotators: {summary.unique_annotators}")
-        print(f"   Gold coverage: {summary.gold_coverage * 100:.1f}% | Co-annotated items: {summary.coannotated_items}")
+        print(
+            f"   Items: {summary.unique_items} | Annotations: {summary.current_annotation_events} | Annotators: {summary.unique_annotators}"
+        )
+        print(
+            f"   Gold coverage: {summary.gold_coverage * 100:.1f}% | Co-annotated items: {summary.coannotated_items}"
+        )
 
     print("\n" + "=" * 80)
     print("DATAQUAL V4 DEMO WORKFLOW EXECUTED SUCCESSFULLY!")

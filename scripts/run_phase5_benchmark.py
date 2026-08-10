@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
+
 from dataqual.benchmarking.runner import BenchmarkRunner
 
 
@@ -19,7 +19,7 @@ def run_full_phase5_benchmark():
     for sc in scenarios:
         print(f"\n---> Running Benchmark for Scenario {sc} (10 seeds)...")
         runner = BenchmarkRunner(scenario_id=sc, seed_count=10)
-        manifest, candidates = runner.run_benchmark()
+        manifest, _candidates = runner.run_benchmark()
 
         manifest_file = out_dir / f"manifest_{sc.lower()}.json"
         manifest_file.write_text(manifest.model_dump_json(indent=2), encoding="utf-8")
@@ -27,7 +27,7 @@ def run_full_phase5_benchmark():
         s = manifest.summary
         all_summaries.append(s)
 
-        print(f"     AUREC@20% Means:")
+        print("     AUREC@20% Means:")
         for m in s.methods:
             print(f"       - {m:28s}: {s.method_aurec_means[m]:.4f} ± {s.method_aurec_stds[m]:.4f}")
 
