@@ -1,0 +1,6 @@
+outputs/
+raw/
+.venv/
+__pycache__/
+*.pyc
+frontend_probe/node_modules/

@@ -1,0 +1,7 @@
+{
+  "annotations": [
+    {"annotation_id":"json_001","item_id":"json_item_1","annotator_id":"worker_01","label":"positive","event_version":1,"timestamp":"2026-02-01T00:00:00Z","annotation_source":"human"},
+    {"annotation_id":"json_002","item_id":"json_item_1","annotator_id":"worker_02","label":"neutral","event_version":1,"timestamp":"2026-02-01T00:00:01+00:00","annotation_source":"human","gold_label":"positive","gold_source":"benchmark_truth"},
+    {"annotation_id":"json_003","item_id":"json_item_2","annotator_id":"worker_01","label":"negative","event_version":1,"annotation_source":"human"}
+  ]
+}

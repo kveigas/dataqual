@@ -1,0 +1,40 @@
+OPEN THIS FOLDER AS THE CODEX WORKSPACE ROOT.
+
+Task:
+Read DATAQUAL_V4_SPEC.md and inspect everything under v3_reference/.
+
+DO NOT IMPLEMENT V4 YET.
+DO NOT MODIFY V3.
+
+Produce a rigorous v3-to-v4 gap analysis.
+
+For every major v4 requirement classify it as:
+1. Already genuinely implemented
+2. Partially reusable from v3
+3. Simulated in v3 and must be replaced
+4. Completely new
+5. Research/implementation risk
+
+Return:
+
+V3 COMPONENTS WORTH PRESERVING:
+V3 COMPONENTS TO DISCARD:
+V3 SIMULATIONS THAT MUST BECOME REAL:
+V4 NEW MODULES REQUIRED:
+DATA MIGRATION REQUIREMENTS:
+ALGORITHM IMPLEMENTATION RISKS:
+BENCHMARK DATASET REQUIREMENTS:
+DEPENDENCIES REQUIRED:
+PROPOSED V4 REPOSITORY STRUCTURE:
+PROPOSED IMPLEMENTATION PHASES:
+ESTIMATED TEST STRATEGY:
+TOP 10 TECHNICAL RISKS:
+
+Important:
+- Do not praise the specification automatically.
+- Challenge technically unsound or over-ambitious decisions.
+- Identify anything too broad for one coherent portfolio project.
+- Identify algorithms that should use vetted reference implementations.
+- Identify algorithms worth implementing from scratch to demonstrate understanding.
+- Separate genuine v3 functionality from simulated/demo-only behavior.
+- Do not write production code.

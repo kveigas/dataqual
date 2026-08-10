@@ -1,0 +1,14 @@
+{
+  "schema_version": "4.0.0",
+  "project_id": "demo_project",
+  "project_name": "DataQual Phase 1 deterministic demo",
+  "label_domain_id": "sentiment_v1",
+  "labels": ["positive", "neutral", "negative"],
+  "dataset_name": "Synthetic annotation fixture",
+  "dataset_version": "1.0.0",
+  "source_uri": "synthetic://phase1-demo",
+  "license": "CC0-1.0",
+  "redistribution_allowed": true,
+  "annotation_source_default": "human",
+  "default_timezone": "UTC"
+}

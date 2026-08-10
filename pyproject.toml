@@ -1,0 +1,69 @@
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dataqual-v4"
+version = "0.1.0"
+description = "Evidence-preserving data foundation for DataQual v4"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "duckdb==1.5.5",
+  "fastapi==0.141.1",
+  "numpy==2.4.2",
+  "pyarrow==25.0.0",
+  "pydantic==2.13.4",
+  "python-multipart==0.0.22",
+  "tzdata==2026.3",
+  "typer==0.27.1",
+  "uvicorn==0.52.1",
+]
+
+[dependency-groups]
+dev = [
+  "crowd-kit==1.4.2",
+  "httpx==0.28.1",
+  "hypothesis==6.165.2",
+  "nltk==3.9.2",
+  "openpyxl==3.1.5",
+  "pandas==3.0.1",
+  "pre-commit==4.6.1",
+  "pyright==1.1.411",
+  "pytest==9.1.1",
+  "pytest-cov==7.1.0",
+  "ruff==0.16.2",
+  "scikit-learn==1.8.0",
+]
+
+[project.scripts]
+dataqual = "dataqual.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["backend/src/dataqual"]
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+addopts = "--strict-markers --strict-config"
+
+[tool.coverage.run]
+branch = true
+source = ["dataqual"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 90
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "RUF", "SIM", "C4", "S"]
+ignore = ["S101"]
+
+[tool.ruff.lint.per-file-ignores]
+"backend/tests/**/*.py" = ["S101", "S105", "S106"]
+
+[tool.ruff.format]
+quote-style = "double"

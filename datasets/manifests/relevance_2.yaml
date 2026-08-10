@@ -1,0 +1,140 @@
+manifest_version: "1.0.0"
+dataset_name: "Crowd-Kit relevance-2"
+license_status: "unresolved"
+release_benchmark: false
+public_artifact_eligible: false
+historical_audit_only: true
+source: "Yandex Relevance 2 Gradations project (2016), distributed by the Toloka-maintained Crowd-Kit loader"
+source_url: "https://tlk.s3.yandex.net/dataset/crowd-kit/relevance-2.zip"
+checksum_url: "https://tlk.s3.yandex.net/dataset/crowd-kit/relevance-2.md5"
+loader_source_url: "https://github.com/Toloka/crowd-kit/blob/v1.4.2/crowdkit/datasets/_loaders.py"
+crowdkit_loader: "crowdkit.datasets._loaders.load_relevance2"
+crowdkit_version_verified: "1.4.2"
+download_date: "2026-08-09"
+
+license:
+  status: "unverified"
+  identifier: null
+  evidence: "Neither Crowd-Kit v1.4.2's relevance-2 loader metadata nor the downloaded ZIP supplies a dataset license. The Crowd-Kit Apache-2.0 software license must not be assumed to license the dataset."
+  redistribution_allowed: false
+  repository_policy: "Do not commit or redistribute the ZIP or extracted CSV files until the dataset maintainer supplies explicit terms. Commit only this manifest and the downloader."
+
+citation:
+  dataset_specific: null
+  requirement_status: "unverified"
+  source_description: "Yandex Relevance 2 Gradations project, collected in 2016"
+  crowdkit_citation: "Ustalov, D., Pavlichenko, N., & Tseitlin, B. (2024). Learning from Crowds with Crowd-Kit. Journal of Open Source Software, 9(96), 6227. https://doi.org/10.21105/joss.06227"
+  note: "Citing Crowd-Kit does not replace a dataset-specific citation if the maintainer later supplies one."
+
+files:
+  - name: "relevance-2.zip"
+    role: "immutable upstream archive"
+    bytes: 2753627
+    md5: "a39c3c30d9e946eeb80ca39954c96e95"
+    sha256: "0d8b5c4ffdb042cc1435ac20933bcf3218310e0bcc6dd27baef5bcfe64973bef"
+    commit_to_repository: false
+  - name: "relevance-2/crowd_labels.csv"
+    role: "raw crowd annotations"
+    bytes: 7005006
+    sha256: "7dea85d1fe7a7a0adc5aef6267d6386aec6a632152d2960a6b48fa984aafa27c"
+    commit_to_repository: false
+  - name: "relevance-2/gt.csv"
+    role: "raw ground-truth subset"
+    bytes: 89629
+    sha256: "f3e69c1cd3809bc929b720f995bdd072ea69a06bdfefcf71336e33716b4693f5"
+    commit_to_repository: false
+
+sha256:
+  archive: "0d8b5c4ffdb042cc1435ac20933bcf3218310e0bcc6dd27baef5bcfe64973bef"
+  crowd_labels_csv: "7dea85d1fe7a7a0adc5aef6267d6386aec6a632152d2960a6b48fa984aafa27c"
+  ground_truth_csv: "f3e69c1cd3809bc929b720f995bdd072ea69a06bdfefcf71336e33716b4693f5"
+
+schema:
+  raw_annotations:
+    file: "crowd_labels.csv"
+    fields:
+      performer: "string; anonymized worker ID; Crowd-Kit renames this field to worker"
+      task: "string; task/item ID"
+      label: "integer; binary annotation in {0, 1}"
+  crowdkit_annotations:
+    fields:
+      worker: "string; renamed from raw performer"
+      task: "string; task/item ID"
+      label: "int64; binary annotation in {0, 1}"
+  raw_ground_truth:
+    file: "gt.csv"
+    fields:
+      task: "string; task/item ID"
+      label: "integer; binary gold label in {0, 1}"
+  crowdkit_ground_truth:
+    type: "pandas Series indexed by task"
+    name: "true_label"
+
+row_counts:
+  annotations: 475536
+  annotation_items: 99319
+  workers: 7138
+  unique_worker_item_pairs: 475536
+  ground_truth_rows: 10079
+  annotation_items_with_ground_truth: 10079
+  annotation_items_without_ground_truth: 89240
+  ground_truth_items_without_annotations: 0
+  annotation_label_0: 197696
+  annotation_label_1: 277840
+  ground_truth_label_0: 5998
+  ground_truth_label_1: 4081
+
+missingness:
+  null_worker: 0
+  null_task: 0
+  null_annotation_label: 0
+  null_ground_truth_task: 0
+  null_ground_truth_label: 0
+  items_with_1_annotation: 1392
+  items_with_2_annotations: 1715
+  items_with_3_annotations: 1565
+  items_with_4_annotations: 7216
+  items_with_5_annotations: 87431
+
+overlap:
+  duplicate_worker_item_pairs: 0
+  exact_duplicate_annotation_rows: 0
+  annotations_per_item:
+    min: 1
+    median: 5
+    max: 5
+    mean: 4.787966048792275
+  items_per_worker:
+    min: 1
+    median: 40
+    max: 1354
+    mean: 66.62034183244606
+  bipartite_connected_components: 3
+  component_profiles:
+    - items: 99301
+      workers: 7131
+    - items: 10
+      workers: 2
+    - items: 8
+      workers: 5
+
+registered_split_analysis:
+  rule: "First 64 bits of SHA-256('relevance-2-v1|' + task_id), modulo 10; buckets 0-1 development and 2-9 evaluation"
+  development_gold_items: 2085
+  evaluation_gold_items: 7994
+  development_gold_annotation_rows: 9959
+  evaluation_gold_annotation_rows: 38309
+  workers_with_any_development_gold: 4384
+  workers_with_at_least_20_development_gold_annotations: 6
+  development_gold_annotations_from_eligible_workers: 149
+  evaluation_items_with_at_least_one_eligible_weighted_vote_worker: 496
+  evaluation_items_without_an_eligible_weighted_vote_worker: 7498
+  conclusion: "The locked >=20 development-gold rule leaves only 6.20% evaluation-item coverage. The data is technically structured for MV/DS analysis, but unresolved licensing makes it ineligible for any release benchmark; it is also not a representative gold-weighted-vote comparison."
+
+notes:
+  - "The official archive contains only crowd_labels.csv and gt.csv; it contains no README, LICENSE, or citation file."
+  - "Most items have five annotations, but 11,888 items have fewer than five. This is incomplete coverage, not null-valued annotation rows."
+  - "Ground truth covers only 10,079 of 99,319 annotated items."
+  - "Three worker-item connected components exist; component-aware Dawid-Skene eligibility rules are required."
+  - "The pre-registered split exposes inadequate gold/worker overlap for the locked weighted-vote threshold. Do not lower the threshold after observing this result; restrict weighted-vote evaluation to simulation or pre-register a better-suited licensed dataset."
+  - "The downloader at spikes/phase0/download_relevance_2.py verifies both the upstream MD5 and this manifest's SHA-256 without changing raw bytes."

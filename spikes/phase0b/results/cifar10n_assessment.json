@@ -1,0 +1,103 @@
+{
+  "authoritative_repository": "https://github.com/UCSC-REAL/cifar-10-100n",
+  "license": "CC BY-NC 4.0",
+  "license_scope_evidence": "Root LICENSE.md applies a CC BY-NC 4.0 license to the repository; README calls this repository the official dataset release. No narrower per-file exception was found. Non-commercial and attribution terms apply.",
+  "checksums": {
+    "LICENSE.md": {
+      "url": "https://raw.githubusercontent.com/UCSC-REAL/cifar-10-100n/main/LICENSE.md",
+      "bytes": 19921,
+      "sha256": "327a71fc6dde573ec05f9b931c63da6561c9622258bb8636fe5d353ec92c1dd8"
+    },
+    "README.md": {
+      "url": "https://raw.githubusercontent.com/UCSC-REAL/cifar-10-100n/main/README.md",
+      "bytes": 5191,
+      "sha256": "54f0fced31e0e6a097512275ebda3ee9f5f1bb484db3b0cd958e6e8e3d525767"
+    },
+    "side_info_cifar10N.csv": {
+      "url": "https://raw.githubusercontent.com/UCSC-REAL/cifar-10-100n/main/side_info_cifar10N.csv",
+      "bytes": 170902,
+      "sha256": "50fcbe619a003d0b804a20ece51447dcdb48978c60e1202371d08302b2e14351"
+    },
+    "CIFAR-10_human_ordered.npy": {
+      "url": "https://raw.githubusercontent.com/UCSC-REAL/cifar-10-100n/main/data/CIFAR-10_human_ordered.npy",
+      "bytes": 9300422,
+      "sha256": "ce7dbb10797c3b8a2ad27aaf2ea49925a0111c74a6cf2c1d0319727aac9f7720"
+    }
+  },
+  "side_info": {
+    "rows": 5000,
+    "columns": [
+      "Image-batch",
+      "Worker1-id",
+      "Work-time-in-seconds-1",
+      "Worker2-id",
+      "Work-time-in-seconds-2",
+      "Worker3-id",
+      "Work-time-in-seconds-3"
+    ],
+    "unique_workers_across_slots": 747,
+    "sample": [
+      {
+        "Image-batch": "0--9",
+        "Worker1-id": "198",
+        "Work-time-in-seconds-1": "25",
+        "Worker2-id": "385",
+        "Work-time-in-seconds-2": "40",
+        "Worker3-id": "197",
+        "Work-time-in-seconds-3": "21"
+      },
+      {
+        "Image-batch": "10--19",
+        "Worker1-id": "430",
+        "Work-time-in-seconds-1": "46",
+        "Worker2-id": "140",
+        "Work-time-in-seconds-2": "27",
+        "Worker3-id": "584",
+        "Work-time-in-seconds-3": "92"
+      },
+      {
+        "Image-batch": "20--29",
+        "Worker1-id": "601",
+        "Work-time-in-seconds-1": "45",
+        "Worker2-id": "430",
+        "Work-time-in-seconds-2": "50",
+        "Worker3-id": "631",
+        "Work-time-in-seconds-3": "49"
+      }
+    ]
+  },
+  "label_arrays": {
+    "clean_label": [
+      50000
+    ],
+    "aggre_label": [
+      50000
+    ],
+    "worse_label": [
+      50000
+    ],
+    "random_label1": [
+      50000
+    ],
+    "random_label2": [
+      50000
+    ],
+    "random_label3": [
+      50000
+    ]
+  },
+  "structural_checks": {
+    "aggregate_matches_simple_mode_fraction": 0.98492,
+    "worst_label_is_one_of_three_labels_fraction": 1.0
+  },
+  "assessment": {
+    "event_reconstruction": "plausible but not authoritatively documented",
+    "reason": "The label artifact exposes three per-item arrays named random_label1..3 and side_info exposes Worker1..3 for each ten-image batch. Slot-wise mapping is plausible, but the official README does not explicitly state that random_labelN belongs to WorkerN. Treat item-worker-label reconstruction as unresolved pending authoritative confirmation rather than relying on column-name inference.",
+    "dawid_skene": "potentially suitable only after slot mapping is verified",
+    "worker_reliability": "potentially suitable only after slot mapping is verified",
+    "weighted_vote": "potentially suitable; clean labels exist, but mapping and split must be verified",
+    "class_specific_error_analysis": "suitable using noisy-label arrays versus clean labels",
+    "timing": "batch-level only; not per annotation",
+    "recommended_role": "secondary real human label-noise validation only"
+  }
+}

@@ -1,0 +1,38 @@
+.venv/
+node_modules/
+frontend/dist/
+frontend/coverage/
+frontend/test-results/
+coverage/
+.pytest_cache/
+.hypothesis/
+.ruff_cache/
+.coverage
+htmlcov/
+__pycache__/
+*.py[cod]
+*.tsbuildinfo
+
+# Data & Storage
+data/*
+!data/.gitignore
+artifacts/*
+!artifacts/.gitignore
+scratch/
+temp*/
+*.duckdb
+*.db
+
+# Environments & Credentials
+.env
+.env.*
+
+# Testing & Reports
+test-results/
+playwright-report/
+
+# OS & Editor Artifacts
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

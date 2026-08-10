@@ -1,0 +1,74 @@
+[
+  {
+    "name": "Dr. Aris Thorne",
+    "email": "aris.thorne@dataqual.ai",
+    "role": "lead",
+    "accuracy": 98,
+    "kappa": 0.95,
+    "throughput": 420,
+    "avgTime": 18
+  },
+  {
+    "name": "Siddharth Rao",
+    "email": "siddharth.r@dataqual.ai",
+    "role": "reviewer",
+    "accuracy": 94,
+    "kappa": 0.89,
+    "throughput": 360,
+    "avgTime": 22
+  },
+  {
+    "name": "Elena Rostova",
+    "email": "elena.r@dataqual.ai",
+    "role": "annotator",
+    "accuracy": 91,
+    "kappa": 0.86,
+    "throughput": 310,
+    "avgTime": 25
+  },
+  {
+    "name": "Marcus Vance",
+    "email": "marcus.v@dataqual.ai",
+    "role": "annotator",
+    "accuracy": 88,
+    "kappa": 0.81,
+    "throughput": 290,
+    "avgTime": 28
+  },
+  {
+    "name": "Maya Lin",
+    "email": "maya.lin@dataqual.ai",
+    "role": "annotator",
+    "accuracy": 85,
+    "kappa": 0.77,
+    "throughput": 270,
+    "avgTime": 30
+  },
+  {
+    "name": "David Kim",
+    "email": "david.k@dataqual.ai",
+    "role": "annotator",
+    "accuracy": 82,
+    "kappa": 0.72,
+    "throughput": 240,
+    "avgTime": 35
+  },
+  {
+    "name": "Amara Okafor",
+    "email": "amara.o@dataqual.ai",
+    "role": "reviewer",
+    "accuracy": 93,
+    "kappa": 0.88,
+    "throughput": 340,
+    "avgTime": 21
+  },
+  {
+    "name": "Lucas Morales",
+    "email": "lucas.m@dataqual.ai",
+    "role": "annotator",
+    "accuracy": 78,
+    "kappa": 0.65,
+    "throughput": 210,
+    "avgTime": 40
+  }
+]

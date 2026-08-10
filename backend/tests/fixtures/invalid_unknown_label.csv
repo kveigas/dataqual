@@ -1,0 +1,2 @@
+annotation_id,item_id,annotator_id,label,event_version,annotation_source
+bad_001,item_001,worker_01,uncertain,1,human

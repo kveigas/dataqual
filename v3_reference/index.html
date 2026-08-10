@@ -1,0 +1,1869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DataQual — Annotation Quality Intelligence</title>
+  <meta name="description" content="Real-time annotation quality monitoring, consensus analysis, active learning, and weak supervision for data labeling teams.">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+  <!-- React 18 CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- PapaParse for CSV Upload Bug #2 -->
+  <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+  <!-- Babel for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, createContext, useContext, useMemo, useRef } = React;
+
+    // --- HELPER FUNCTIONS ---
+    const generateId = () => 'id_' + Math.random().toString(36).substr(2, 9);
+
+    const useLocalStorage = (key, initialValue) => {
+      const [storedValue, setStoredValue] = useState(() => {
+        try {
+          const item = localStorage.getItem(key);
+          return item ? JSON.parse(item) : initialValue;
+        } catch (error) {
+          console.error(error);
+          return initialValue;
+        }
+      });
+
+      const setValue = (value) => {
+        try {
+          const valueToStore = value instanceof Function ? value(storedValue) : value;
+          setStoredValue(valueToStore);
+          localStorage.setItem(key, JSON.stringify(valueToStore));
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+      return [storedValue, setValue];
+    };
+
+    // BUG #7 & #13 FIX: Lift tierThresholds into computeQualityScoreAndTier
+    const computeQualityScoreAndTier = (data, thresholds = { plat: 90, gold: 75, silver: 60 }) => {
+      const accuracy = (data.accuracy !== '' && Number.isFinite(Number(data.accuracy))) ? Number(data.accuracy) : (Number(data.metrics?.accuracy?.overall) || 85);
+      const kappa = Number.isFinite(Number(data.kappa)) ? Number(data.kappa) : (Number(data.metrics?.consistency?.krippendorffsAlpha) || 0.75);
+      const throughput = Number.isFinite(Number(data.throughput)) ? Number(data.throughput) : (Number(data.metrics?.productivity?.throughput) || 250);
+      const f1Score = Number.isFinite(Number(data.f1Score)) ? Number(data.f1Score) : (Number(data.metrics?.accuracy?.f1Score) || 88);
+      const honeypotPass = Number.isFinite(Number(data.honeypotPass)) ? Number(data.honeypotPass) : (Number(data.metrics?.qualityDiagnostics?.honeypotPassRate) || 92);
+
+      // BUG #11 FIX: Normalized Kappa formula for range [-1.0, 1.0]
+      const normAccuracy = Math.min(100, Math.max(0, accuracy));
+      const normAlpha = Math.min(100, Math.max(0, ((kappa + 1) / 2) * 100));
+      const normThroughput = Math.min(100, (throughput / 400) * 100);
+      const normF1 = Math.min(100, Math.max(0, f1Score));
+
+      const qualityScore = Math.round((normAccuracy * 0.4) + (normAlpha * 0.25) + (normF1 * 0.2) + (normThroughput * 0.15));
+      
+      let tier = 'bronze';
+      if (qualityScore >= thresholds.plat) tier = 'platinum';
+      else if (qualityScore >= thresholds.gold) tier = 'gold';
+      else if (qualityScore >= thresholds.silver) tier = 'silver';
+
+      return {
+        metrics: {
+          accuracy: { overall: accuracy, precision: Math.min(100, accuracy + 1), recall: Math.max(0, accuracy - 2), f1Score, trend: [accuracy - 2, accuracy - 1, accuracy] },
+          consistency: { krippendorffsAlpha: kappa, gwetsAC1: Math.min(1, kappa + 0.03), fleissKappa: Math.max(0, kappa - 0.04) },
+          productivity: { throughput, avgTimePerAnnotation: Math.round(3600 / (throughput || 1)), activeHours: 6.8, idleTimePct: 4.2 },
+          qualityDiagnostics: { honeypotPassRate: honeypotPass, anchoringBiasIdx: 0.14, boundaryPrecisionPx: 1.2 },
+          qualityScore
+        },
+        tier
+      };
+    };
+
+    // BUG #14 FIX: Avatar component with local SVG initial fallback if external image fails
+    const Avatar = ({ src, name, size = 36 }) => {
+      const [imgFailed, setImgFailed] = useState(false);
+      const initials = (name || 'U').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
+      if (!src || imgFailed) {
+        return (
+          <div className="avatar-fallback" style={{ width: size, height: size, fontSize: size * 0.38 }}>
+            {initials}
+          </div>
+        );
+      }
+
+      return (
+        <img
+          src={src}
+          alt={name}
+          onError={() => setImgFailed(true)}
+          style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover' }}
+        />
+      );
+    };
+
+    // --- ICONS COMPONENT ---
+    const Icon = ({ name, size = 18 }) => {
+      const icons = {
+        'home': <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />,
+        'trophy': <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34M12 2a6 6 0 0 0-6 6v3a6 6 0 0 0 12 0V8a6 6 0 0 0-6-6z" />,
+        'git-merge': <path d="M18 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M6 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M6 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M6 9v6M9 18h6" />,
+        'target': <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0M12 12m-6 0a6 6 0 1 0 12 0a6 6 0 1 0 -12 0M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />,
+        'sparkles': <path d="M12 3l1.912 5.813a2 2 0 001.275 1.275L21 12l-5.813 1.912a2 2 0 00-1.275 1.275L12 21l-1.912-5.813a2 2 0 00-1.275-1.275L3 12l5.813-1.912a2 2 0 001.275-1.275L12 3z" />,
+        'scale': <path d="M16 16l3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1zM2 16l3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1zM7 21h10M12 3v18" />,
+        'code': <path d="M16 18l6-6-6-6M8 6l-6 6 6 6" />,
+        'plus-circle': <path d="M12 8v8M8 12h8M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />,
+        'settings': <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />,
+        'search': <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />,
+        'command': <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 6 0 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 6 0V6a3 3 0 0 0-6 0 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z" />,
+        'download': <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />,
+        'upload': <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />,
+        'trash': <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />,
+        'users': <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />,
+        'external-link': <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" />,
+        'check': <path d="M20 6L9 17l-5-5" />,
+        'x': <path d="M18 6L6 18M6 6l12 12" />,
+        'play': <path d="M5 3l14 9-14 9V3z" />,
+        'refresh': <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+      };
+
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          {icons[name] || icons['home']}
+        </svg>
+      );
+    };
+
+    const TierBadge = ({ tier }) => {
+      const colorsMap = {
+        platinum: 'var(--tier-platinum)',
+        gold: 'var(--tier-gold)',
+        silver: 'var(--tier-silver)',
+        bronze: 'var(--tier-bronze)'
+      };
+      return (
+        <span className="tier-badge" style={{ background: colorsMap[tier] || colorsMap.bronze }}>
+          {tier ? tier.toUpperCase() : 'BRONZE'}
+        </span>
+      );
+    };
+
+    const Card = ({ children, className = '', style = {} }) => (
+      <div className={`card ${className}`} style={style}>{children}</div>
+    );
+
+    // --- CONTEXT & PROVIDER ---
+    const DataContext = createContext();
+
+    const defaultProjectsList = [
+      {
+        id: 'proj-1', name: '1. Autonomous Driving Perception (CV)', category: 'Computer Vision',
+        totalItems: 25000, completedItems: 21450, accuracy: 98.4, status: 'active',
+        customDetails: { iouThreshold: '0.85 IoU', frameResolution: '4K @ 30fps', sensorType: 'LiDAR + Stereo Camera', occlusionTolerance: '30% Max' }
+      },
+      {
+        id: 'proj-2', name: '2. LLM Medical NLP Benchmark (NLP)', category: 'NLP / Healthcare',
+        totalItems: 18500, completedItems: 14200, accuracy: 96.2, status: 'active',
+        customDetails: { maxTokenLength: '4096 Tokens', taxonomySchema: 'ICD-11 / SNOMED CT', entityResolver: 'PubMed BERT', privacyStandard: 'HIPAA Compliant' }
+      },
+      {
+        id: 'proj-3', name: '3. E-Commerce Visual Search (Multimodal)', category: 'Multimodal CV',
+        totalItems: 42000, completedItems: 38900, accuracy: 94.8, status: 'active',
+        customDetails: { clipScoreThreshold: '0.82 Score', catalogCategories: '14,000 SKUs', queryTypes: 'Zero-shot Fine-grained', aspectMasking: 'Segment Anything v2' }
+      },
+      {
+        id: 'proj-4', name: '4. Financial Fraud Risk Modeling (Tabular)', category: 'Tabular / Risk',
+        totalItems: 12000, completedItems: 11800, accuracy: 99.1, status: 'completed',
+        customDetails: { featureDimensions: '128 Transaction Signals', classImbalanceRatio: '1:10,000', anomalyAlgorithm: 'Isolation Forest', privacyEpsilon: 'ε = 0.5' }
+      },
+      {
+        id: 'proj-5', name: '5. Robotics Spatial Grasping (3D Point Cloud)', category: '3D Point Cloud',
+        totalItems: 30000, completedItems: 18600, accuracy: 92.5, status: 'active',
+        customDetails: { pointCountPerFrame: '100,000 Points', spatialCoordinates: 'XYZ + RGB + Intensity', gripperDoF: '6-DoF Kinematics', collisionMargin: '2.5 mm' }
+      }
+    ];
+
+    const sampleAnnotators = [
+      {
+        id: 'a1', name: 'Dr. Aris Thorne', email: 'aris.thorne@dataqual.ai', role: 'lead', specialization: 'Medical Imaging', seniority: 'Lead Expert', language: 'English / German', hourlyRate: 50, status: 'active',
+        avatar: 'https://ui-avatars.com/api/?name=Aris+Thorne&background=3b82f6&color=fff', joinedAt: new Date().toISOString(),
+        metrics: {
+          accuracy: { overall: 98.2, precision: 98.6, recall: 97.8, f1Score: 98.2, trend: [97, 98, 98.2] },
+          consistency: { krippendorffsAlpha: 0.95, gwetsAC1: 0.96, fleissKappa: 0.94 },
+          productivity: { throughput: 420, avgTimePerAnnotation: 18, activeHours: 7.2, idleTimePct: 2.1 },
+          qualityDiagnostics: { honeypotPassRate: 99.4, anchoringBiasIdx: 0.08, boundaryPrecisionPx: 0.8 },
+          qualityScore: 98
+        }, tier: 'platinum'
+      },
+      {
+        id: 'a2', name: 'Siddharth Rao', email: 'siddharth.r@dataqual.ai', role: 'reviewer', specialization: 'NLP / LLM Evaluation', seniority: 'Senior', language: 'English / Hindi', hourlyRate: 40, status: 'active',
+        avatar: 'https://ui-avatars.com/api/?name=Siddharth+Rao&background=8b5cf6&color=fff', joinedAt: new Date().toISOString(),
+        metrics: {
+          accuracy: { overall: 94.5, precision: 95.1, recall: 93.8, f1Score: 94.4, trend: [92, 94, 94.5] },
+          consistency: { krippendorffsAlpha: 0.89, gwetsAC1: 0.91, fleissKappa: 0.88 },
+          productivity: { throughput: 360, avgTimePerAnnotation: 22, activeHours: 6.8, idleTimePct: 3.5 },
+          qualityDiagnostics: { honeypotPassRate: 96.2, anchoringBiasIdx: 0.12, boundaryPrecisionPx: 1.1 },
+          qualityScore: 92
+        }, tier: 'platinum'
+      },
+      {
+        id: 'a3', name: 'Elena Rostova', email: 'elena.r@dataqual.ai', role: 'annotator', specialization: 'Computer Vision', seniority: 'Mid-Level', language: 'Russian / English', hourlyRate: 30, status: 'active',
+        avatar: 'https://ui-avatars.com/api/?name=Elena+Rostova&background=10b981&color=fff', joinedAt: new Date().toISOString(),
+        metrics: {
+          accuracy: { overall: 91.0, precision: 91.8, recall: 90.2, f1Score: 91.0, trend: [89, 90, 91] },
+          consistency: { krippendorffsAlpha: 0.85, gwetsAC1: 0.87, fleissKappa: 0.83 },
+          productivity: { throughput: 310, avgTimePerAnnotation: 25, activeHours: 6.5, idleTimePct: 4.8 },
+          qualityDiagnostics: { honeypotPassRate: 93.0, anchoringBiasIdx: 0.18, boundaryPrecisionPx: 1.5 },
+          qualityScore: 88
+        }, tier: 'gold'
+      },
+      {
+        id: 'a4', name: 'Marcus Vance', email: 'marcus.v@dataqual.ai', role: 'annotator', specialization: 'Financial Risk', seniority: 'Junior', language: 'English / Spanish', hourlyRate: 25, status: 'active',
+        avatar: 'https://ui-avatars.com/api/?name=Marcus+Vance&background=f59e0b&color=fff', joinedAt: new Date().toISOString(),
+        metrics: {
+          accuracy: { overall: 88.4, precision: 89.0, recall: 87.8, f1Score: 88.4, trend: [86, 87, 88.4] },
+          consistency: { krippendorffsAlpha: 0.81, gwetsAC1: 0.83, fleissKappa: 0.79 },
+          productivity: { throughput: 280, avgTimePerAnnotation: 28, activeHours: 6.0, idleTimePct: 6.2 },
+          qualityDiagnostics: { honeypotPassRate: 89.5, anchoringBiasIdx: 0.24, boundaryPrecisionPx: 2.1 },
+          qualityScore: 84
+        }, tier: 'gold'
+      }
+    ];
+
+    const DataProvider = ({ children }) => {
+      const [tierThresholds, setTierThresholds] = useLocalStorage('dq_tier_thresholds_v5', { plat: 90, gold: 75, silver: 60 });
+      const [annotators, setAnnotators] = useLocalStorage('dq_annotators_v5', []);
+      const [projects, setProjects] = useLocalStorage('dq_projects_v5', defaultProjectsList);
+      const [activeProjectId, setActiveProjectId] = useLocalStorage('dq_active_project_id', 'proj-1');
+      const [activeTab, setActiveTab] = useLocalStorage('dq_active_tab_v5', 'docs');
+      const [searchQuery, setSearchQuery] = useState('');
+      const [showCommandPalette, setShowCommandPalette] = useState(false);
+      const [showResetModal, setShowResetModal] = useState(false);
+      const [showDemoPopup, setShowDemoPopup] = useLocalStorage('dq_show_demo_popup_v6', true);
+      
+      // BUG #8, #9 FIX: Lift toggle states into DataProvider so actions mutate real data
+      const [blindReviewActive, setBlindReviewActive] = useLocalStorage('dq_blind_review', false);
+      const [biasAwareVotingActive, setBiasAwareVotingActive] = useLocalStorage('dq_bias_aware', false);
+      const [webhookEnabled, setWebhookEnabled] = useLocalStorage('dq_webhook_enabled', true);
+
+      const activeProject = useMemo(() => {
+        return (projects || defaultProjectsList).find(p => p.id === activeProjectId) || defaultProjectsList[0];
+      }, [projects, activeProjectId]);
+
+      const addAnnotator = (data) => {
+        const { metrics, tier } = computeQualityScoreAndTier(data, tierThresholds);
+        const newAnnotator = {
+          id: generateId(),
+          name: data.name,
+          email: data.email || '',
+          role: data.role || 'annotator',
+          specialization: data.specialization || 'General',
+          seniority: data.seniority || 'Mid-Level',
+          language: data.language || 'English',
+          hourlyRate: Number(data.hourlyRate) || 30,
+          status: 'active',
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=random`,
+          joinedAt: new Date().toISOString(),
+          metrics,
+          tier
+        };
+        setAnnotators([...annotators, newAnnotator]);
+      };
+
+      // FINDING #2 FIX: Flexible case-insensitive key extractor matching Full Name, Email, Languages, etc.
+      const getRecValue = (rec, ...aliases) => {
+        if (!rec || typeof rec !== 'object') return undefined;
+        for (const alias of aliases) {
+          const target = alias.toLowerCase().replace(/[^a-z0-9]/g, '');
+          for (const key in rec) {
+            const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (cleanKey === target && rec[key] !== undefined && rec[key] !== '') {
+              return rec[key];
+            }
+          }
+        }
+        return undefined;
+      };
+
+      const importData = (jsonArray) => {
+        if (!Array.isArray(jsonArray)) return;
+        const normalized = jsonArray.map(rec => {
+          const nameVal = getRecValue(rec, 'name', 'fullname', 'annotatorname') || 'Unnamed Annotator';
+          const emailVal = getRecValue(rec, 'email', 'emailaddress') || '';
+          const roleVal = getRecValue(rec, 'role', 'operationalrole') || 'annotator';
+          const specVal = getRecValue(rec, 'specialization', 'domainspecialization', 'specialty') || 'General';
+          const senVal = getRecValue(rec, 'seniority', 'experience') || 'Mid-Level';
+          const langVal = getRecValue(rec, 'language', 'languages', 'nativelanguage') || 'English';
+          const rateVal = Number(getRecValue(rec, 'hourlyrate', 'rate', 'hourlyrateusd')) || 30;
+
+          const statusVal = getRecValue(rec, 'status', 'state', 'annotatorstatus') || 'active';
+          const accVal = Number(getRecValue(rec, 'accuracy', 'overallaccuracy', 'accuracyrate'));
+          const f1Val = Number(getRecValue(rec, 'f1score', 'f1'));
+          
+          // FINDING #5 FIX: Distinct lookups for Krippendorff's Alpha vs Cohen's Kappa
+          const directAlpha = Number(getRecValue(rec, 'krippendorffsalpha', 'alpha'));
+          const directKappa = Number(getRecValue(rec, 'cohenskappa', 'kappa'));
+          const alphaVal = Number.isFinite(directAlpha) ? directAlpha : (Number.isFinite(directKappa) ? directKappa : undefined);
+
+          const throuVal = Number(getRecValue(rec, 'throughput', 'dailythroughput'));
+          const honeyVal = Number(getRecValue(rec, 'honeypotpass', 'honeypotpassrate', 'honeypot'));
+
+          const shapeInput = {
+            name: nameVal, email: emailVal, role: roleVal, specialization: specVal, seniority: senVal, language: langVal, hourlyRate: rateVal,
+            accuracy: Number.isFinite(accVal) ? accVal : undefined,
+            f1Score: Number.isFinite(f1Val) ? f1Val : undefined,
+            kappa: Number.isFinite(alphaVal) ? alphaVal : undefined,
+            throughput: Number.isFinite(throuVal) ? throuVal : undefined,
+            honeypotPass: Number.isFinite(honeyVal) ? honeyVal : undefined
+          };
+
+          const { metrics, tier } = computeQualityScoreAndTier(shapeInput, tierThresholds);
+          return {
+            id: rec.id || generateId(),
+            name: nameVal,
+            email: emailVal,
+            role: roleVal,
+            specialization: specVal,
+            seniority: senVal,
+            language: langVal,
+            hourlyRate: rateVal,
+            status: statusVal,
+            avatar: rec.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(nameVal)}&background=random`,
+            joinedAt: rec.joinedAt || new Date().toISOString(),
+            metrics: rec.metrics || metrics,
+            tier: rec.tier || tier
+          };
+        });
+        setAnnotators([...annotators, ...normalized]);
+      };
+
+      const updateAnnotator = (id, updates) => {
+        setAnnotators(annotators.map(a => a.id === id ? { ...a, ...updates } : a));
+      };
+
+      const removeAnnotator = (id) => {
+        setAnnotators(annotators.filter(a => a.id !== id));
+      };
+
+      const exportData = () => JSON.stringify(annotators, null, 2);
+
+      // BUG #12 FIX: Full Reset App state handler
+      const clearAllData = () => {
+        setAnnotators([]);
+        setProjects(defaultProjectsList);
+        setActiveProjectId('proj-1');
+        setActiveTab('docs');
+        setBlindReviewActive(false);
+        setBiasAwareVotingActive(false);
+        try {
+          localStorage.removeItem('dq_annotators_v5');
+        } catch (e) {
+          console.error(e);
+        }
+      };
+
+      const loadDemoData = () => {
+        setAnnotators(sampleAnnotators);
+        setActiveTab('dashboard');
+      };
+
+      const toggleCommandPalette = () => setShowCommandPalette(prev => !prev);
+
+      // Recompute tiers when thresholds change
+      useEffect(() => {
+        setAnnotators(prev => prev.map(a => {
+          const { tier } = computeQualityScoreAndTier(a, tierThresholds);
+          return { ...a, tier };
+        }));
+      }, [tierThresholds]);
+
+      return (
+        <DataContext.Provider value={{
+          annotators, projects, activeProjectId, setActiveProjectId, activeProject, activeTab, searchQuery, showCommandPalette,
+          tierThresholds, setTierThresholds, blindReviewActive, setBlindReviewActive, biasAwareVotingActive, setBiasAwareVotingActive,
+          webhookEnabled, setWebhookEnabled,
+          addAnnotator, updateAnnotator, removeAnnotator, importData, exportData, clearAllData, loadDemoData,
+          setActiveTab, setSearchQuery, toggleCommandPalette, setShowCommandPalette
+        }}>
+          {children}
+        </DataContext.Provider>
+      );
+    };
+
+    // --- RESET MODAL ---
+    const ResetModal = ({ isOpen, onClose, onConfirm }) => {
+      if (!isOpen) return null;
+      return (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(5, 8, 16, 0.85)', backdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000
+        }}>
+          <div className="card" style={{ maxWidth: 440, width: '90%', padding: 24, border: '1px solid var(--danger)', boxShadow: '0 20px 50px rgba(239, 68, 68, 0.2)' }}>
+            <div className="flex items-center gap-3" style={{ marginBottom: 16 }}>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Icon name="trash" size={20} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 18, color: '#fff' }}>Reset Application State?</h3>
+                <p style={{ margin: '2px 0 0 0', fontSize: 12, color: 'var(--text-tertiary)' }}>Confirmation Required</p>
+              </div>
+            </div>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.6, marginBottom: 24 }}>
+              Are you sure you want to reset DataQual? This will restore initial project defaults and clear custom annotator records.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button className="btn-secondary" onClick={onClose} style={{ padding: '8px 16px' }}>Cancel</button>
+              <button className="btn-primary" onClick={onConfirm} style={{ background: '#ef4444', color: '#fff', padding: '8px 18px' }}>
+                Yes, Reset Application
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // --- TOP BAR COMPONENT ---
+    const TopBar = () => {
+      const { activeTab, searchQuery, setSearchQuery, toggleCommandPalette, clearAllData, setActiveTab, projects, activeProjectId, setActiveProjectId, activeProject } = useContext(DataContext);
+      const [showResetModal, setShowResetModal] = useState(false);
+
+      const handleConfirmReset = () => {
+        clearAllData();
+        setShowResetModal(false);
+      };
+
+      const titles = {
+        'dashboard': 'Dashboard Overview',
+        'ranking': 'Annotator Leaderboard & Tiers',
+        'consensus': 'Inter-Annotator Agreement & Consensus Engine',
+        'smart-sampling': 'Active Learning & Smart Sampling',
+        'ai-assist': 'AI Pre-Annotation & Anchoring Bias Control',
+        'fairness': 'Demographic Parity & Bias Auditing',
+        'data-prog': 'Programmatic Weak Supervision (Snorkel IDE)',
+        'data-input': 'Data Ingestion & Annotator Management',
+        'settings': 'Application Configuration & Settings',
+        'docs': 'System Architecture & Technical Documentation'
+      };
+
+      return (
+        <div className="top-bar">
+          
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="flex items-center gap-4">
+              <h1 className="page-title" style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>{titles[activeTab] || 'Dashboard'}</h1>
+              
+              <div className="flex items-center gap-2" style={{ background: 'var(--bg-tertiary)', padding: '6px 12px', borderRadius: 8, border: '1px solid var(--border)' }}>
+                <span style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 700, letterSpacing: '0.05em' }}>PROJECT:</span>
+                <select
+                  value={activeProjectId || 'proj-1'}
+                  onChange={(e) => setActiveProjectId(e.target.value)}
+                  style={{ background: 'transparent', color: '#fff', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer', outline: 'none' }}
+                >
+                  {(projects || defaultProjectsList).map(p => (
+                    <option key={p.id} value={p.id} style={{ background: '#0a0f1a', color: '#fff' }}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowResetModal(true)}
+                style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '6px 14px', borderRadius: 6, fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
+              >
+                <Icon name="trash" size={14} />
+                <span>Refresh / Reset App</span>
+              </button>
+              <button className="btn-icon" onClick={toggleCommandPalette} title="Command Palette (Cmd+K)">
+                <Icon name="command" size={18} />
+              </button>
+            </div>
+          </div>
+
+          {/* ACTIVE DOMAIN PARAMETER BANNER RE-ADDED */}
+          {activeProject && activeProject.customDetails && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, background: '#0a0f1a', padding: '8px 14px', borderRadius: 6, border: '1px solid var(--border)', fontSize: 12, overflowX: 'auto' }}>
+              <span style={{ color: 'var(--accent)', fontWeight: 700, textTransform: 'uppercase', fontSize: 10, letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
+                ⚙️ {activeProject.category} PARAMETERS:
+              </span>
+              {Object.entries(activeProject.customDetails).map(([key, val]) => (
+                <div key={key} style={{ display: 'flex', gap: 4, whiteSpace: 'nowrap' }}>
+                  <span style={{ color: 'var(--text-tertiary)', textTransform: 'capitalize' }}>{key.replace(/([A-Z])/g, ' $1')}:</span>
+                  <span style={{ color: '#fff', fontWeight: 600 }}>{val}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // --- SIDEBAR ---
+    const Sidebar = () => {
+      const { activeTab, setActiveTab, annotators } = useContext(DataContext);
+      
+      const navItems = [
+        { id: 'docs', label: 'Documentation (PDF)', icon: 'code' },
+        { id: 'dashboard', label: 'Dashboard Overview', icon: 'home' },
+        { id: 'ranking', label: 'Ranking Leaderboard', icon: 'trophy' },
+        { id: 'consensus', label: 'Consensus Engine', icon: 'git-merge' },
+        { id: 'smart-sampling', label: 'Smart Sampling', icon: 'target' },
+        { id: 'ai-assist', label: 'AI Assist', icon: 'sparkles' },
+        { id: 'fairness', label: 'Fairness Audit', icon: 'scale' },
+        { id: 'data-prog', label: 'Data Programming', icon: 'code' },
+        { id: 'data-input', label: 'Data Input', icon: 'plus-circle' },
+        { id: 'settings', label: 'Settings', icon: 'settings' }
+      ];
+
+      return (
+        <aside className="sidebar">
+          <div style={{ padding: 24, display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid var(--border)' }}>
+            <div style={{ background: 'var(--accent)', color: 'white', padding: 8, borderRadius: 8, fontWeight: 800 }}>DQ</div>
+            <div style={{ fontWeight: 700, fontSize: 18 }}>DataQual</div>
+            <span className="badge badge-purple" style={{ fontSize: 11, borderRadius: 4, padding: '2px 6px' }}>Advanced Version</span>
+          </div>
+          
+          <nav style={{ padding: '16px 12px', flex: 1, overflowY: 'auto' }}>
+            {navItems.map(item => (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '12px 16px',
+                  background: activeTab === item.id ? 'var(--bg-tertiary)' : 'transparent',
+                  border: 'none',
+                  borderLeft: activeTab === item.id ? '4px solid var(--accent)' : '4px solid transparent',
+                  borderRadius: activeTab === item.id ? '0 4px 4px 0' : 0,
+                  color: activeTab === item.id ? 'white' : 'var(--text-muted)',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  marginBottom: 4,
+                  fontSize: 14
+                }}
+              >
+                <Icon name={item.icon} size={20} />
+                <span style={{ flex: 1 }}>{item.label}</span>
+              </button>
+            ))}
+          </nav>
+          
+          {/* BUG #6 FIX: Verified live URL */}
+          <div style={{ padding: 24, borderTop: '1px solid var(--border)', fontSize: 12, color: 'var(--text-muted)' }}>
+            <div className="flex items-center gap-2 mb-2">
+              <span style={{ width: 8, height: 8, background: '#10b981', borderRadius: '50%', display: 'inline-block' }} /> {annotators.length} Annotators Loaded
+            </div>
+            <a 
+              href="https://ubiquitous-lollipop-198399.netlify.app" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                color: '#3b82f6',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: '13px',
+                padding: '8px 12px',
+                background: 'rgba(59, 130, 246, 0.1)',
+                borderRadius: '6px',
+                border: '1px solid rgba(59, 130, 246, 0.2)',
+                marginTop: '8px',
+                width: '100%',
+                justifyContent: 'center'
+              }}
+            >
+              <Icon name="external-link" size={14} /> Back to Portfolio
+            </a>
+          </div>
+        </aside>
+      );
+    };
+
+    // --- ANNOTATOR DETAIL MODAL ---
+    const AnnotatorDetailModal = ({ annotator, onClose }) => {
+      if (!annotator) return null;
+      // BUG #4 FIX: Guard metrics sub-objects defensively
+      const m = annotator.metrics || {};
+      const acc = m.accuracy || {};
+      const con = m.consistency || {};
+      const prod = m.productivity || {};
+      const diag = m.qualityDiagnostics || {};
+
+      return (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(5, 8, 16, 0.85)', backdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000
+        }}>
+          <div className="card" style={{ maxWidth: 640, width: '92%', maxHeight: '90vh', overflowY: 'auto', padding: 24, border: '1px solid var(--accent)' }}>
+            <div className="flex justify-between items-center" style={{ borderBottom: '1px solid var(--border)', paddingBottom: 12, marginBottom: 16 }}>
+              <div className="flex items-center gap-3">
+                <Avatar src={annotator.avatar} name={annotator.name} size={44} />
+                <div>
+                  <h3 style={{ margin: 0, fontSize: 18, color: '#fff' }}>{annotator.name}</h3>
+                  {/* BUG #3 FIX: Defensive role guard */}
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{annotator.email} &bull; {(annotator.role || 'annotator').toUpperCase()}</div>
+                </div>
+              </div>
+              <button onClick={onClose} style={{ background: 'transparent', color: '#fff', border: 'none', cursor: 'pointer' }}>
+                <Icon name="x" size={20} />
+              </button>
+            </div>
+
+            <div className="flex-col gap-4">
+              <div>
+                <h4 style={{ margin: '0 0 8px 0', color: 'var(--accent)', fontSize: 13, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                  1. Accuracy & Confusion Matrix Diagnostics
+                </h4>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+                  <div style={{ background: 'var(--bg-tertiary)', padding: 10, borderRadius: 6 }}>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Overall Accuracy</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: '#10b981' }}>{acc.overall || 88}%</div>
+                  </div>
+                  <div style={{ background: 'var(--bg-tertiary)', padding: 10, borderRadius: 6 }}>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Precision Score</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: '#3b82f6' }}>{acc.precision || 89}%</div>
+                  </div>
+                  <div style={{ background: 'var(--bg-tertiary)', padding: 10, borderRadius: 6 }}>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Recall Score</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: '#8b5cf6' }}>{acc.recall || 87}%</div>
+                  </div>
+                  <div style={{ background: 'var(--bg-tertiary)', padding: 10, borderRadius: 6 }}>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>F1-Score</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: '#f59e0b' }}>{acc.f1Score || 88}%</div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 style={{ margin: '0 0 8px 0', color: 'var(--accent)', fontSize: 13, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                  2. Inter-Annotator Agreement & Reliability
+                </h4>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                  <div style={{ background: 'var(--bg-tertiary)', padding: 10, borderRadius: 6 }}>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Krippendorff's Alpha (&alpha;)</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{con.krippendorffsAlpha || 0.85}</div>
+                  </div>
+                  <div style={{ background: 'var(--bg-tertiary)', padding: 10, borderRadius: 6 }}>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Gwet's AC1 Score</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{con.gwetsAC1 || 0.88}</div>
+                  </div>
+                  <div style={{ background: 'var(--bg-tertiary)', padding: 10, borderRadius: 6 }}>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Fleiss' Kappa</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{con.fleissKappa || 0.82}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginTop: 20, textAlign: 'right' }}>
+              <button className="btn-secondary" onClick={onClose} style={{ padding: '6px 16px' }}>Close Inspector</button>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // --- PAGES ---
+
+    // 1. DOCS TAB (BUG #5 COMPLETE COPY & DISABLED BUTTON FIX)
+    const DocsTab = () => {
+      const { loadDemoData, annotators } = useContext(DataContext);
+      const [pdfAvailable, setPdfAvailable] = useState(true);
+
+      useEffect(() => {
+        fetch('./DataQual_v3_Complete_Specification_and_Codebase.pdf', { method: 'HEAD' })
+          .then(res => setPdfAvailable(res.ok))
+          .catch(() => setPdfAvailable(false));
+      }, []);
+
+      const downloadPdf = () => {
+        if (!pdfAvailable) return;
+        const a = document.createElement('a');
+        a.href = './DataQual_v3_Complete_Specification_and_Codebase.pdf';
+        a.download = 'DataQual_v3_Complete_Specification_and_Codebase.pdf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      };
+
+      return (
+        <div className="flex-col gap-4" style={{ height: 'calc(100vh - 120px)', display: 'flex', flexDirection: 'column' }}>
+          <div className="card flex justify-between items-center" style={{ background: 'linear-gradient(135deg, #111827 0%, #1e293b 100%)', border: '1px solid var(--accent)', padding: '16px 24px', flexShrink: 0 }}>
+            <div>
+              <div style={{ color: 'var(--accent)', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 2 }}>
+                📄 Complete Specification & Codebase PDF Manual
+              </div>
+              <h2 style={{ margin: 0, fontSize: 20, color: '#fff' }}>DataQual Advanced Version — Platform Specification & Codebase (PDF)</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: 12, margin: '2px 0 0 0' }}>Comprehensive guide covering annotator profiles, multi-project workflows, agreement metrics, and source code.</p>
+            </div>
+            <div className="flex gap-2">
+              {annotators.length === 0 && (
+                <button onClick={loadDemoData} style={{ background: '#10b981', color: '#fff', fontSize: 13, padding: '8px 14px', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer' }}>
+                  <Icon name="sparkles" size={16} /> Load Demo Team Dataset
+                </button>
+              )}
+              <button
+                onClick={downloadPdf}
+                disabled={!pdfAvailable}
+                style={{
+                  background: '#3b82f6',
+                  color: '#fff',
+                  fontSize: 13,
+                  padding: '8px 16px',
+                  border: 'none',
+                  borderRadius: 6,
+                  fontWeight: 600,
+                  cursor: pdfAvailable ? 'pointer' : 'not-allowed',
+                  opacity: pdfAvailable ? 1 : 0.5
+                }}
+              >
+                <Icon name="download" size={16} /> {pdfAvailable ? 'Download Official PDF' : 'PDF Unavailable'}
+              </button>
+            </div>
+          </div>
+
+          <div className="card" style={{ flex: 1, padding: 0, overflow: 'hidden', border: '1px solid var(--border)', background: '#1e293b', display: 'flex', flexDirection: 'column' }}>
+            {pdfAvailable ? (
+              <iframe
+                src="./DataQual_v3_Complete_Specification_and_Codebase.pdf#toolbar=1&navpanes=1"
+                title="DataQual Advanced Version Specification PDF"
+                style={{ width: '100%', height: '100%', border: 'none', minHeight: '650px', background: '#ffffff' }}
+              />
+            ) : (
+              <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <Icon name="code" size={48} />
+                <h3 style={{ margin: '16px 0 8px 0', color: '#fff' }}>Specification PDF Unavailable</h3>
+                <p style={{ maxWidth: 480, fontSize: 14 }}>
+                  The technical specification PDF document is currently generating. Click "Load Demo Team Dataset" above or review the system documentation online.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    // 2. DASHBOARD OVERVIEW
+    const DashboardOverview = () => {
+      const { annotators, loadDemoData, activeProject } = useContext(DataContext);
+
+      if (!annotators || annotators.length === 0) {
+        return (
+          <div className="card text-center" style={{ padding: '60px 20px', margin: '20px 0' }}>
+            <div style={{ color: 'var(--text-tertiary)', marginBottom: 16 }}>
+              <Icon name="users" size={48} />
+            </div>
+            <h3 style={{ margin: '0 0 8px 0', fontSize: 18, color: '#fff' }}>No Annotator Data Loaded</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: 14, maxWidth: 500, margin: '0 auto 20px auto' }}>
+              Welcome to DataQual Advanced Version! Your project starts clean. Add your team members via <strong>Data Input</strong> or click below to load a live demo dataset.
+            </p>
+            <button onClick={loadDemoData} style={{ background: '#10b981', color: '#fff', padding: '10px 20px', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer' }}>
+              <Icon name="sparkles" size={16} /> Load Demo Team Dataset
+            </button>
+          </div>
+        );
+      }
+
+      // BUG #4 FIX: Guard metrics reduce defensively
+      const avgQuality = Math.round(annotators.reduce((acc, a) => acc + (a.metrics?.qualityScore || 85), 0) / (annotators.length || 1));
+      const totalThroughput = annotators.reduce((acc, a) => acc + (a.metrics?.productivity?.throughput || 250), 0);
+      const topPerformers = [...annotators].sort((a, b) => (b.metrics?.qualityScore || 0) - (a.metrics?.qualityScore || 0)).slice(0, 3);
+
+      return (
+        <div className="flex-col gap-4">
+          <Card style={{ background: 'linear-gradient(135deg, #111827 0%, #0f172a 100%)', border: '1px solid var(--accent)', padding: '16px 20px' }}>
+            <div className="flex justify-between items-center" style={{ marginBottom: 12 }}>
+              <div>
+                <span style={{ fontSize: 11, color: 'var(--accent)', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                  ⚙️ Active Domain Parameter Configuration
+                </span>
+                <h3 style={{ margin: '2px 0 0 0', fontSize: 17, color: '#fff' }}>{activeProject.name}</h3>
+              </div>
+              <span className="badge badge-purple" style={{ fontSize: 12 }}>{activeProject.category}</span>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+              {activeProject.customDetails && Object.entries(activeProject.customDetails).map(([k, v]) => (
+                <div key={k} style={{ background: 'var(--bg-tertiary)', padding: '10px 12px', borderRadius: 6 }}>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'capitalize' }}>{k.replace(/([A-Z])/g, ' $1')}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginTop: 2 }}>{v}</div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+            <Card>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Total Active Annotators</div>
+              <div style={{ fontSize: 28, fontWeight: 800, color: '#fff', margin: '6px 0' }}>{annotators.length}</div>
+              <div style={{ fontSize: 11, color: '#10b981' }}>Active: {activeProject.name}</div>
+            </Card>
+            <Card>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Average Quality Score</div>
+              <div style={{ fontSize: 28, fontWeight: 800, color: '#3b82f6', margin: '6px 0' }}>{avgQuality}/100</div>
+              <div style={{ fontSize: 11, color: '#3b82f6' }}>Platinum / Gold Tier Pool</div>
+            </Card>
+            <Card>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Daily Throughput</div>
+              <div style={{ fontSize: 28, fontWeight: 800, color: '#8b5cf6', margin: '6px 0' }}>{totalThroughput.toLocaleString()}</div>
+              <div style={{ fontSize: 11, color: '#8b5cf6' }}>Items Annotated / Day</div>
+            </Card>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}>
+            <Card>
+              <h3 style={{ margin: '0 0 16px 0', fontSize: 16, color: '#fff' }}>Quality Score Trend (7 Days)</h3>
+              <div style={{ height: 240, display: 'flex', alignItems: 'flex-end', gap: 12, padding: '20px 0', borderBottom: '1px solid var(--border)' }}>
+                {[84, 87, 89, 92, 91, 94, 95].map((val, idx) => (
+                  <div key={idx} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{val}%</span>
+                    <div style={{ width: '100%', background: 'linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%)', height: `${val * 2}px`, borderRadius: '4px 4px 0 0' }} />
+                    <span style={{ fontSize: 10, color: 'var(--text-tertiary)' }}>Day {idx + 1}</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <Card>
+              <h3 style={{ margin: '0 0 16px 0', fontSize: 16, color: '#fff' }}>Top Performers</h3>
+              <div className="flex-col gap-3">
+                {topPerformers.map((a, i) => (
+                  <div key={a.id} className="flex justify-between items-center" style={{ padding: '10px 12px', background: 'var(--bg-tertiary)', borderRadius: 8 }}>
+                    <div className="flex items-center gap-2">
+                      <Avatar src={a.avatar} name={a.name} size={32} />
+                      <div>
+                        <div style={{ fontWeight: 600, color: '#fff', fontSize: 13 }}>#{i+1} {a.name}</div>
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{a.specialization || a.role} &bull; ${a.hourlyRate || 35}/hr</div>
+                      </div>
+                    </div>
+                    <TierBadge tier={a.tier} />
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </div>
+      );
+    };
+
+    // 3. RANKING LEADERBOARD
+    const RankingLeaderboard = () => {
+      const { annotators } = useContext(DataContext);
+      const [search, setSearch] = useState('');
+      const [sortBy, setSortBy] = useState('qualityScore');
+      const [inspectingAnnotator, setInspectingAnnotator] = useState(null);
+
+      if (!annotators || annotators.length === 0) {
+        return (
+          <div className="card text-center" style={{ padding: '60px 20px', margin: '20px 0' }}>
+            <div style={{ color: 'var(--text-tertiary)', marginBottom: 16 }}>
+              <Icon name="trophy" size={48} />
+            </div>
+            <h3 style={{ margin: '0 0 8px 0', fontSize: 18, color: '#fff' }}>No Annotator Rankings</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: 14, maxWidth: 500, margin: '0 auto 20px auto' }}>
+              Add team members in <strong>Data Input</strong> to populate the tier leaderboard with full complex metrics profiles.
+            </p>
+          </div>
+        );
+      }
+
+      const filtered = annotators.filter(a => a.name.toLowerCase().includes(search.toLowerCase()) || (a.specialization || '').toLowerCase().includes(search.toLowerCase()));
+
+      const sorted = [...filtered].sort((a, b) => {
+        const qsA = a.metrics?.qualityScore || 0;
+        const qsB = b.metrics?.qualityScore || 0;
+        if (sortBy === 'qualityScore') return qsB - qsA;
+        if (sortBy === 'accuracy') return (b.metrics?.accuracy?.overall || 0) - (a.metrics?.accuracy?.overall || 0);
+        if (sortBy === 'throughput') return (b.metrics?.productivity?.throughput || 0) - (a.metrics?.productivity?.throughput || 0);
+        if (sortBy === 'rate') return (b.hourlyRate || 0) - (a.hourlyRate || 0);
+        return 0;
+      });
+
+      return (
+        <Card>
+          <AnnotatorDetailModal annotator={inspectingAnnotator} onClose={() => setInspectingAnnotator(null)} />
+          
+          <div className="flex justify-between items-center" style={{ marginBottom: 16 }}>
+            <h3 style={{ margin: 0, fontSize: 16, color: '#fff' }}>Annotator Leaderboard & Complex Metrics Inspector</h3>
+            <div className="flex gap-3">
+              <input
+                type="text"
+                placeholder="Filter annotators..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                style={{ padding: '6px 12px', background: '#0a0f1a', color: '#fff', border: '1px solid var(--border)', borderRadius: 6, fontSize: 13 }}
+              />
+              <select
+                value={sortBy}
+                onChange={e => setSortBy(e.target.value)}
+                style={{ padding: '6px 12px', background: '#0a0f1a', color: '#fff', border: '1px solid var(--border)', borderRadius: 6, fontSize: 13 }}
+              >
+                <option value="qualityScore">Sort by Quality Score</option>
+                <option value="accuracy">Sort by Accuracy</option>
+                <option value="throughput">Sort by Throughput</option>
+                <option value="rate">Sort by Hourly Rate</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Annotator</th>
+                  <th>Specialization</th>
+                  <th>Accuracy</th>
+                  <th>Krippendorff's Alpha (&alpha;)</th>
+                  <th>Throughput</th>
+                  <th>Hourly Rate</th>
+                  <th>Tier</th>
+                  <th>Metrics Inspector</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sorted.map((a, idx) => (
+                  <tr key={a.id}>
+                    <td style={{ fontWeight: 700, color: '#fff' }}>#{idx + 1}</td>
+                    <td style={{ color: '#fff', fontWeight: 600 }}>
+                      <div className="flex items-center gap-2">
+                        <Avatar src={a.avatar} name={a.name} size={28} />
+                        {a.name}
+                      </div>
+                    </td>
+                    <td style={{ color: 'var(--text-muted)' }}>{a.specialization || 'General'}</td>
+                    <td style={{ color: '#10b981', fontWeight: 600 }}>{a.metrics?.accuracy?.overall || 88}%</td>
+                    <td style={{ color: '#3b82f6', fontWeight: 600 }}>{a.metrics?.consistency?.krippendorffsAlpha || 0.85}</td>
+                    <td style={{ color: 'var(--text-secondary)' }}>{a.metrics?.productivity?.throughput || 250} items/day</td>
+                    <td style={{ color: '#8b5cf6', fontWeight: 600 }}>${a.hourlyRate || 30}/hr</td>
+                    <td><TierBadge tier={a.tier} /></td>
+                    <td>
+                      <button
+                        onClick={() => setInspectingAnnotator(a)}
+                        style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', padding: '4px 10px', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer' }}
+                      >
+                        Inspect Details &rarr;
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      );
+    };
+
+    // 4. CONSENSUS ENGINE (BUGS C & D FIXED)
+    const ConsensusTab = () => {
+      const { annotators } = useContext(DataContext);
+      const [resolvedItems, setResolvedItems] = useState([]);
+
+      // Reset resolved items when roster changes
+      useEffect(() => {
+        setResolvedItems([]);
+      }, [annotators.length]);
+
+      if (!annotators || annotators.length === 0) {
+        return (
+          <div className="card text-center" style={{ padding: '60px 20px', margin: '20px 0' }}>
+            <Icon name="git-merge" size={48} />
+            <h3 style={{ margin: '12px 0 8px 0', fontSize: 18, color: '#fff' }}>No Consensus Data</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Navigate to <strong>Data Input</strong> to add your team members or upload a dataset.</p>
+          </div>
+        );
+      }
+
+      // Dynamic disputed items with roster-specific IDs
+      const dynamicDisputedItems = useMemo(() => {
+        const names = annotators.map(a => a.name);
+        if (names.length < 2) return [];
+        return [
+          { id: `item-101-${names[0]}-${names[1]}`, text: 'MRI Brain Scan Annotation #402', labels: { [names[0]]: 'Glioma Positive', [names[1]]: 'Healthy Control' }, confidence: 0.62 },
+          { id: `item-104-${names[0]}-${names[1]}`, text: 'LLM Response Safety Score #812', labels: { [names[0]]: 'Unsafe / Toxic', [names[1]]: 'Benign / Safe' }, confidence: 0.54 }
+        ];
+      }, [annotators]);
+
+      const activeQueue = dynamicDisputedItems.filter(item => !resolvedItems.includes(item.id));
+
+      return (
+        <div className="flex-col gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+            <Card>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Krippendorff's Alpha (&alpha;)</div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: '#10b981', margin: '6px 0' }}>0.94</div>
+              <div style={{ fontSize: 11, color: '#10b981' }}>High Agreement Across Team</div>
+            </Card>
+            <Card>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Gwet's AC1 Score</div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: '#3b82f6', margin: '6px 0' }}>0.96</div>
+              <div style={{ fontSize: 11, color: '#3b82f6' }}>Prevalence-Adjusted Reliability</div>
+            </Card>
+            <Card>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Dawid-Skene Error Rate</div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: '#8b5cf6', margin: '6px 0' }}>2.1%</div>
+              <div style={{ fontSize: 11, color: '#8b5cf6' }}>Bayesian Annotator Competence</div>
+            </Card>
+          </div>
+
+          <Card>
+            <h3 style={{ margin: '0 0 16px 0', color: '#fff', fontSize: 16 }}>Inter-Annotator Pairwise Agreement Matrix</h3>
+            <div className="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: 'left' }}>Evaluator</th>
+                    {annotators.map(a => <th key={a.id}>{a.name.split(' ')[0]}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {annotators.map((rowAnnotator, rIdx) => (
+                    <tr key={rowAnnotator.id}>
+                      <td style={{ fontWeight: 600, color: '#fff' }}>{rowAnnotator.name}</td>
+                      {annotators.map((colAnnotator, cIdx) => {
+                        const val = rIdx === cIdx ? 100 : Math.round(90 + (Math.sin(rIdx + cIdx) * 6));
+                        return (
+                          <td key={colAnnotator.id} style={{ background: rIdx === cIdx ? 'rgba(59, 130, 246, 0.2)' : 'transparent', color: val > 92 ? '#10b981' : '#f59e0b', fontWeight: 700, textAlign: 'center' }}>
+                            {val}%
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          <Card>
+            <div className="flex justify-between items-center" style={{ marginBottom: 16 }}>
+              <h3 style={{ margin: 0, color: '#fff', fontSize: 16 }}>Disputed Items Adjudication Queue ({activeQueue.length} Active)</h3>
+              <span className="badge badge-purple">{resolvedItems.length} Resolved</span>
+            </div>
+            {annotators.length < 2 ? (
+              <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+                Add at least 2 annotators in Data Input to enable inter-annotator consensus adjudication.
+              </div>
+            ) : activeQueue.length === 0 ? (
+              <div style={{ padding: 24, textAlign: 'center', color: '#10b981', fontWeight: 600 }}>
+                <Icon name="check" size={24} /> All disputed items have been adjudicated!
+              </div>
+            ) : (
+              <div className="flex-col gap-3">
+                {activeQueue.map(item => (
+                  <div key={item.id} className="flex justify-between items-center" style={{ padding: 14, background: 'var(--bg-tertiary)', borderRadius: 8, border: '1px solid var(--border)' }}>
+                    <div>
+                      <div style={{ fontWeight: 600, color: '#fff', fontSize: 14 }}>{item.text}</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
+                        Votes: {Object.entries(item.labels).map(([user, vote]) => `${user}: "${vote}"`).join(' | ')}
+                      </div>
+                    </div>
+                    <button onClick={() => setResolvedItems([...resolvedItems, item.id])} style={{ background: '#10b981', color: '#fff', padding: '6px 14px', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontSize: 12 }}>
+                      <Icon name="check" size={14} /> Accept Majority Vote
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+        </div>
+      );
+    };
+
+    // 5. SMART SAMPLING (BUG #9 PLATINUM TARGETING & RECOMPUTE FIX)
+    const SmartSamplingTab = () => {
+      const { annotators, updateAnnotator, tierThresholds } = useContext(DataContext);
+      const [strategy, setStrategy] = useState('BADGE');
+      const [batchSize, setBatchSize] = useState(25);
+      const [routedCount, setRoutedCount] = useState(0);
+
+      const handleExecuteAcquisition = () => {
+        const count = Number(batchSize);
+        setRoutedCount(r => r + count);
+        if (annotators.length > 0) {
+          // Target Platinum annotator first
+          const target = annotators.find(a => a.tier === 'platinum') || annotators[0];
+          const currThroughput = target.metrics?.productivity?.throughput || 300;
+          const newThroughput = currThroughput + count;
+          
+          // Recompute metrics and tier
+          const { metrics: newMetrics, tier: newTier } = computeQualityScoreAndTier({
+            ...target,
+            throughput: newThroughput,
+            metrics: {
+              ...target.metrics,
+              productivity: {
+                ...target.metrics?.productivity,
+                throughput: newThroughput
+              }
+            }
+          }, tierThresholds);
+
+          updateAnnotator(target.id, { metrics: newMetrics, tier: newTier });
+        }
+      };
+
+      if (!annotators || annotators.length === 0) {
+        return (
+          <div className="card text-center" style={{ padding: '60px 20px', margin: '20px 0' }}>
+            <Icon name="target" size={48} />
+            <h3 style={{ margin: '12px 0 8px 0', fontSize: 18, color: '#fff' }}>No Active Learning Queue</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Navigate to <strong>Data Input</strong> to add team members or upload a dataset.</p>
+          </div>
+        );
+      }
+
+      return (
+        <div className="flex-col gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}>
+            <Card>
+              <div className="flex justify-between items-center" style={{ marginBottom: 16 }}>
+                <h3 style={{ margin: 0, color: '#fff', fontSize: 16 }}>2D UMAP Latent Space Projection (Uncertainty Sampling)</h3>
+                <span style={{ fontSize: 12, color: '#3b82f6', fontWeight: 600 }}>Active Algorithm: {strategy}</span>
+              </div>
+              <div style={{ height: 260, background: '#0a0f1a', borderRadius: 8, border: '1px solid var(--border)', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ position: 'absolute', top: 12, left: 12, fontSize: 11, color: 'var(--text-muted)' }}>Cluster Centroids (High Entropy Nodes Glowing)</div>
+                {[...Array(30)].map((_, i) => {
+                  const x = (Math.sin(i * 1.5) * 40 + 50);
+                  const y = (Math.cos(i * 1.3) * 35 + 50);
+                  const isUncertain = i % 4 === 0;
+                  return (
+                    <div
+                      key={i}
+                      style={{
+                        position: 'absolute',
+                        left: `${x}%`,
+                        top: `${y}%`,
+                        width: isUncertain ? 14 : 8,
+                        height: isUncertain ? 14 : 8,
+                        borderRadius: '50%',
+                        background: isUncertain ? '#ef4444' : '#3b82f6',
+                        boxShadow: isUncertain ? '0 0 12px #ef4444' : 'none',
+                        cursor: 'pointer'
+                      }}
+                      title={isUncertain ? `Uncertainty Node #${i+1} (Entropy: 0.94)` : `Normal Node #${i+1}`}
+                    />
+                  );
+                })}
+              </div>
+            </Card>
+
+            <Card>
+              <h3 style={{ margin: '0 0 16px 0', color: '#fff', fontSize: 16 }}>Acquisition Strategy Settings</h3>
+              <div className="flex-col gap-4">
+                <div>
+                  <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>Sampling Algorithm</label>
+                  <select value={strategy} onChange={e => setStrategy(e.target.value)} style={{ width: '100%', marginTop: 4, padding: 8, background: '#0a0f1a', color: '#fff', border: '1px solid var(--border)', borderRadius: 6 }}>
+                    <option value="BADGE">BADGE (Gradient Embedding Clustering)</option>
+                    <option value="BALD">BALD (Bayesian Active Learning Disagreement)</option>
+                    <option value="BatchBALD">BatchBALD (Multi-Item Entropy Reduction)</option>
+                    <option value="Coreset">Coreset Greedy (Geometric Distance)</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>Batch Size ({batchSize} items)</label>
+                  <input type="range" min="10" max="100" value={batchSize} onChange={e => setBatchSize(e.target.value)} style={{ width: '100%', marginTop: 4 }} />
+                </div>
+                <button
+                  onClick={handleExecuteAcquisition}
+                  style={{ background: '#3b82f6', color: '#fff', padding: '10px 16px', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer' }}
+                >
+                  <Icon name="play" size={14} /> Execute Smart Acquisition Queue
+                </button>
+                {routedCount > 0 && (
+                  <div style={{ padding: 10, background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', borderRadius: 6, fontSize: 12, textAlign: 'center', fontWeight: 600 }}>
+                    Routed {routedCount} high-uncertainty items to Platinum Annotators!
+                  </div>
+                )}
+              </div>
+            </Card>
+          </div>
+        </div>
+      );
+    };
+
+    // 6. AI ASSIST (BUG #9 FIX: Blind review state mutated in DataProvider)
+    const AIAssistTab = () => {
+      const { annotators, blindReviewActive, setBlindReviewActive } = useContext(DataContext);
+
+      if (!annotators || annotators.length === 0) {
+        return (
+          <div className="card text-center" style={{ padding: '60px 20px', margin: '20px 0' }}>
+            <Icon name="sparkles" size={48} />
+            <h3 style={{ margin: '12px 0 8px 0', fontSize: 18, color: '#fff' }}>No AI Disposition Metrics</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Navigate to <strong>Data Input</strong> to add team members or upload a dataset.</p>
+          </div>
+        );
+      }
+
+      return (
+        <div className="flex-col gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+            <Card>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>AI Pre-Label Acceptance Rate</div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: '#10b981', margin: '6px 0' }}>74%</div>
+              <div style={{ fontSize: 11, color: '#10b981' }}>Accepted Without Modification</div>
+            </Card>
+            <Card>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>AI Pre-Label Modification Rate</div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: '#f59e0b', margin: '6px 0' }}>18%</div>
+              <div style={{ fontSize: 11, color: '#f59e0b' }}>Corrected by Human Evaluator</div>
+            </Card>
+            <Card>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>AI Label Rejection Rate</div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: '#ef4444', margin: '6px 0' }}>8%</div>
+              <div style={{ fontSize: 11, color: '#ef4444' }}>Completely Overridden</div>
+            </Card>
+          </div>
+
+          <Card style={{ border: blindReviewActive ? '1px solid #10b981' : '1px solid var(--border)' }}>
+            <div className="flex justify-between items-center" style={{ marginBottom: 16 }}>
+              <div>
+                <h3 style={{ margin: 0, color: '#fff', fontSize: 16 }}>Anchoring Bias Control & Blind Review Protocol</h3>
+                <p style={{ margin: '4px 0 0 0', fontSize: 12, color: 'var(--text-muted)' }}>Prevents human annotators from rubber-stamping LLM pre-annotations.</p>
+              </div>
+              <button
+                onClick={() => setBlindReviewActive(!blindReviewActive)}
+                style={{
+                  background: blindReviewActive ? '#10b981' : 'rgba(59, 130, 246, 0.15)',
+                  color: blindReviewActive ? '#fff' : '#3b82f6',
+                  padding: '8px 16px', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer'
+                }}
+              >
+                {blindReviewActive ? '✓ Blind Review Active' : 'Enable Blind Review Protocol'}
+              </button>
+            </div>
+            <div style={{ padding: 14, background: 'var(--bg-tertiary)', borderRadius: 8, fontSize: 13, color: 'var(--text-secondary)' }}>
+              {blindReviewActive ? (
+                <span style={{ color: '#10b981', fontWeight: 600 }}>
+                  🔒 BLIND MODE ENFORCED: LLM suggestions are now hidden until human annotator submits their independent assessment.
+                </span>
+              ) : (
+                <span>
+                  💡 STANDARD MODE: LLM suggestions are pre-filled in the annotation canvas. Monitor acceptance rates to avoid confirmation bias.
+                </span>
+              )}
+            </div>
+          </Card>
+        </div>
+      );
+    };
+
+    // 7. FAIRNESS (BUG #9 FIX: Bias-aware voting state mutated in DataProvider)
+    const FairnessTab = () => {
+      const { annotators, biasAwareVotingActive, setBiasAwareVotingActive } = useContext(DataContext);
+
+      if (!annotators || annotators.length === 0) {
+        return (
+          <div className="card text-center" style={{ padding: '60px 20px', margin: '20px 0' }}>
+            <Icon name="scale" size={48} />
+            <h3 style={{ margin: '12px 0 8px 0', fontSize: 18, color: '#fff' }}>No Demographic Parity Metrics</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Navigate to <strong>Data Input</strong> to add team members or upload a dataset.</p>
+          </div>
+        );
+      }
+
+      return (
+        <div className="flex-col gap-4">
+          <Card>
+            <div className="flex justify-between items-center" style={{ marginBottom: 16 }}>
+              <div>
+                <h3 style={{ margin: 0, color: '#fff', fontSize: 16 }}>Demographic Parity & Subgroup Accuracy Audit</h3>
+                <p style={{ margin: '4px 0 0 0', fontSize: 12, color: 'var(--text-muted)' }}>Evaluates accuracy parity across dialect, region, and language subgroups.</p>
+              </div>
+              <button
+                onClick={() => setBiasAwareVotingActive(!biasAwareVotingActive)}
+                style={{
+                  background: biasAwareVotingActive ? '#8b5cf6' : 'rgba(139, 92, 246, 0.15)',
+                  color: biasAwareVotingActive ? '#fff' : '#8b5cf6',
+                  padding: '8px 16px', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer'
+                }}
+              >
+                {biasAwareVotingActive ? '✓ Bias-Aware Aggregation Active' : 'Enable Bias-Aware Voting'}
+              </button>
+            </div>
+
+            <div className="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Subgroup</th>
+                    <th>Annotator Representation</th>
+                    <th>Accuracy Rate</th>
+                    <th>Parity Index</th>
+                    <th>Audit Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style={{ fontWeight: 600, color: '#fff' }}>English / German Native</td>
+                    <td style={{ color: 'var(--text-muted)' }}>35% of Evaluators</td>
+                    <td style={{ color: '#10b981', fontWeight: 600 }}>98.2%</td>
+                    <td style={{ color: '#fff' }}>1.00 (Baseline)</td>
+                    <td><span className="badge badge-success">Optimal</span></td>
+                  </tr>
+                  <tr>
+                    <td style={{ fontWeight: 600, color: '#fff' }}>English / Hindi Native</td>
+                    <td style={{ color: 'var(--text-muted)' }}>28% of Evaluators</td>
+                    <td style={{ color: '#10b981', fontWeight: 600 }}>94.5%</td>
+                    <td style={{ color: '#fff' }}>0.96</td>
+                    <td><span className="badge badge-success">Optimal</span></td>
+                  </tr>
+                  <tr>
+                    <td style={{ fontWeight: 600, color: '#fff' }}>Spanish / Regional Dialects</td>
+                    <td style={{ color: 'var(--text-muted)' }}>22% of Evaluators</td>
+                    <td style={{ color: '#f59e0b', fontWeight: 600 }}>{biasAwareVotingActive ? '94.2%' : '88.4%'}</td>
+                    <td style={{ color: '#fff' }}>{biasAwareVotingActive ? '0.97' : '0.90'}</td>
+                    <td><span className={biasAwareVotingActive ? 'badge badge-success' : 'badge badge-warning'}>{biasAwareVotingActive ? 'Optimal (Debiased)' : 'Parity Skew'}</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </div>
+      );
+    };
+
+    // 8. DATA PROGRAMMING
+    const DataProgrammingTab = () => {
+      const { annotators } = useContext(DataContext);
+      const [lfCode, setLfCode] = useState(`@labeling_function()
+def lf_detect_toxic_keywords(x):
+    """Flags toxic text keywords in LLM Benchmark datasets"""
+    toxic_words = ["hate", "exploit", "malware", "phishing"]
+    if any(word in x.text.lower() for word in toxic_words):
+        return TOXIC
+    return ABSTAIN`);
+      const [executionStatus, setExecutionStatus] = useState('');
+
+      if (!annotators || annotators.length === 0) {
+        return (
+          <div className="card text-center" style={{ padding: '60px 20px', margin: '20px 0' }}>
+            <Icon name="code" size={48} />
+            <h3 style={{ margin: '12px 0 8px 0', fontSize: 18, color: '#fff' }}>No Labeling Functions Active</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Navigate to <strong>Data Input</strong> to add team members or upload a dataset.</p>
+          </div>
+        );
+      }
+
+      const handleRunLf = () => {
+        setExecutionStatus('Executing Snorkel Generative Model... Label Matrix L calculated! Coverage: 84.2%');
+      };
+
+      return (
+        <div className="flex-col gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 16 }}>
+            <Card>
+              <div className="flex justify-between items-center" style={{ marginBottom: 12 }}>
+                <h3 style={{ margin: 0, color: '#fff', fontSize: 16 }}>Snorkel Labeling Function (LF) Code Editor</h3>
+                <span style={{ fontSize: 11, color: '#8b5cf6', fontFamily: 'monospace' }}>Python 3.10 Runtime</span>
+              </div>
+              <textarea
+                value={lfCode}
+                onChange={e => setLfCode(e.target.value)}
+                rows={10}
+                style={{
+                  width: '100%', background: '#0a0f1a', color: '#10b981', fontFamily: 'Fira Code, monospace',
+                  fontSize: 13, padding: 12, border: '1px solid var(--border)', borderRadius: 6, lineHeight: 1.5
+                }}
+              />
+              <div className="flex justify-between items-center" style={{ marginTop: 12 }}>
+                <button onClick={handleRunLf} style={{ background: '#8b5cf6', color: '#fff', padding: '8px 16px', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer' }}>
+                  <Icon name="play" size={14} /> Run Weak Supervision Pipeline
+                </button>
+                {executionStatus && <span style={{ color: '#10b981', fontSize: 12, fontWeight: 600 }}>{executionStatus}</span>}
+              </div>
+            </Card>
+
+            <Card>
+              <h3 style={{ margin: '0 0 16px 0', color: '#fff', fontSize: 16 }}>Active Labeling Functions (LFs) Matrix</h3>
+              <div className="table-responsive">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>LF Name</th>
+                      <th>Coverage</th>
+                      <th>Conflicts</th>
+                      <th>Empirical Precision</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style={{ fontWeight: 600, color: '#fff' }}>lf_detect_toxic_keywords</td>
+                      <td style={{ color: '#3b82f6' }}>42.1%</td>
+                      <td style={{ color: '#f59e0b' }}>3.2%</td>
+                      <td style={{ color: '#10b981', fontWeight: 600 }}>96.4%</td>
+                    </tr>
+                    <tr>
+                      <td style={{ fontWeight: 600, color: '#fff' }}>lf_sentiment_vader</td>
+                      <td style={{ color: '#3b82f6' }}>38.5%</td>
+                      <td style={{ color: '#f59e0b' }}>5.1%</td>
+                      <td style={{ color: '#10b981', fontWeight: 600 }}>91.8%</td>
+                    </tr>
+                    <tr>
+                      <td style={{ fontWeight: 600, color: '#fff' }}>lf_regex_pattern_medical</td>
+                      <td style={{ color: '#3b82f6' }}>24.8%</td>
+                      <td style={{ color: '#10b981' }}>0.8%</td>
+                      <td style={{ color: '#10b981', fontWeight: 600 }}>98.9%</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </div>
+        </div>
+      );
+    };
+
+    // 9. DATA INPUT (BUG #2 FIX: Real CSV parsing with PapaParse)
+    const DataInputPage = () => {
+      const { annotators, addAnnotator, importData, clearAllData, removeAnnotator, exportData, setShowResetModal } = useContext(DataContext);
+      const [name, setName] = useState('');
+      const [email, setEmail] = useState('');
+      const [role, setRole] = useState('annotator');
+      const [specialization, setSpecialization] = useState('Computer Vision');
+      const [seniority, setSeniority] = useState('Mid-Level');
+      const [language, setLanguage] = useState('English');
+      const [accuracy, setAccuracy] = useState(88);
+      const [f1Score, setF1Score] = useState(89); // BUG #11 FIX: Realistic range
+      const [kappa, setKappa] = useState(0.85);
+      const [throughput, setThroughput] = useState(300);
+      const [hourlyRate, setHourlyRate] = useState(30);
+      const [honeypotPass, setHoneypotPass] = useState(94);
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!name) return;
+        addAnnotator({ name, email, role, specialization, seniority, language, accuracy, f1Score, kappa, throughput, hourlyRate, honeypotPass });
+        setName('');
+        setEmail('');
+      };
+
+      // BUG #2 FIX: Real CSV & JSON parsing branch
+      const handleFileUpload = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          try {
+            if (file.name.toLowerCase().endsWith('.csv')) {
+              if (window.Papa) {
+                const parsed = window.Papa.parse(evt.target.result, { header: true, skipEmptyLines: true });
+                if (parsed.data && parsed.data.length > 0) {
+                  const firstRowKeys = Object.keys(parsed.data[0]).map(k => k.toLowerCase());
+                  const hasName = firstRowKeys.some(k => k.includes('name'));
+                  if (!hasName) {
+                    const confirmImport = window.confirm('CSV Column Warning: Could not find "name" column header. Found columns: ' + Object.keys(parsed.data[0]).join(', ') + '\n\nDo you still want to proceed with import?');
+                    if (!confirmImport) return;
+                  }
+                  importData(parsed.data);
+                  alert(`Successfully imported ${parsed.data.length} CSV records!`);
+                }
+              } else {
+                alert('CSV Parser loading, please try again.');
+              }
+            } else {
+              const data = JSON.parse(evt.target.result);
+              importData(data);
+              alert('JSON dataset imported successfully!');
+            }
+          } catch(err) {
+            alert('Import failed: ' + err.message);
+          }
+        };
+        reader.readAsText(file);
+      };
+
+      return (
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 24 }}>
+          <Card>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: 16, color: '#fff' }}>Add Annotator Profile & Complex Metric Entry Details</h3>
+            <form onSubmit={handleSubmit} className="flex-col gap-3">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div>
+                  <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>1. Full Name *</label>
+                  <input type="text" value={name} onChange={e => setName(e.target.value)} required placeholder="e.g. Dr. Aris Thorne" style={{ width: '100%', marginTop: 4, padding: 8, background: '#0a0f1a', color: '#fff', border: '1px solid var(--border)', borderRadius: 6 }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>2. Email Address</label>
+                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="e.g. aris@dataqual.ai" style={{ width: '100%', marginTop: 4, padding: 8, background: '#0a0f1a', color: '#fff', border: '1px solid var(--border)', borderRadius: 6 }} />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div>
+                  <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>3. Operational Role</label>
+                  <select value={role} onChange={e => setRole(e.target.value)} style={{ width: '100%', marginTop: 4, padding: 8, background: '#0a0f1a', color: '#fff', border: '1px solid var(--border)', borderRadius: 6 }}>
+                    <option value="annotator">Annotator</option>
+                    <option value="reviewer">Reviewer</option>
+                    <option value="lead">Lead Evaluator</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>4. Domain Specialization</label>
+                  <select value={specialization} onChange={e => setSpecialization(e.target.value)} style={{ width: '100%', marginTop: 4, padding: 8, background: '#0a0f1a', color: '#fff', border: '1px solid var(--border)', borderRadius: 6 }}>
+                    <option value="Computer Vision">Computer Vision (CV)</option>
+                    <option value="Medical Imaging">Medical Imaging</option>
+                    <option value="NLP / LLM Evaluation">NLP / LLM Evaluation</option>
+                    <option value="Financial Fraud">Financial Fraud</option>
+                    <option value="3D Spatial Point Cloud">3D Spatial Point Cloud</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12, marginTop: 4 }}>
+                <h4 style={{ margin: '0 0 10px 0', fontSize: 12, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Granular Metric Entry Details:
+                </h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+                  <div>
+                    <label style={{ fontSize: 11, color: 'var(--text-muted)' }}>Overall Accuracy ({accuracy}%)</label>
+                    <input type="range" min="50" max="100" value={accuracy} onChange={e => setAccuracy(e.target.value)} style={{ width: '100%', marginTop: 2 }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 11, color: 'var(--text-muted)' }}>F1-Score ({f1Score}%)</label>
+                    <input type="range" min="50" max="100" value={f1Score} onChange={e => setF1Score(e.target.value)} style={{ width: '100%', marginTop: 2 }} />
+                  </div>
+                  <div>
+                    {/* BUG #11 FIX: Range aligned with negative-to-positive Kappa normalization */}
+                    <label style={{ fontSize: 11, color: 'var(--text-muted)' }}>Krippendorff's Alpha (&alpha;) (&kappa;: {kappa})</label>
+                    <input type="range" min="-1.0" max="1.0" step="0.05" value={kappa} onChange={e => setKappa(e.target.value)} style={{ width: '100%', marginTop: 2 }} />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginTop: 8 }}>
+                  <div>
+                    <label style={{ fontSize: 11, color: 'var(--text-muted)' }}>Throughput (items/day)</label>
+                    <input type="number" value={throughput} onChange={e => setThroughput(e.target.value)} style={{ width: '100%', marginTop: 2, padding: 6, background: '#0a0f1a', color: '#fff', border: '1px solid var(--border)', borderRadius: 6 }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 11, color: 'var(--text-muted)' }}>Hourly Rate ($/hr)</label>
+                    <input type="number" value={hourlyRate} onChange={e => setHourlyRate(e.target.value)} style={{ width: '100%', marginTop: 2, padding: 6, background: '#0a0f1a', color: '#fff', border: '1px solid var(--border)', borderRadius: 6 }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 11, color: 'var(--text-muted)' }}>Honeypot Pass Rate ({honeypotPass}%)</label>
+                    <input type="range" min="60" max="100" value={honeypotPass} onChange={e => setHoneypotPass(e.target.value)} style={{ width: '100%', marginTop: 2 }} />
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" style={{ background: '#3b82f6', color: '#fff', padding: '10px 16px', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer', marginTop: 12 }}>
+                Save Annotator Profile & Complex Metrics
+              </button>
+            </form>
+          </Card>
+
+          <div className="flex-col gap-4">
+            <Card>
+              <h3 style={{ margin: '0 0 16px 0', fontSize: 16, color: '#fff' }}>Upload Batch Dataset (.CSV / .JSON)</h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 16 }}>Import batch annotators or dataset records directly into DataQual.</p>
+              <div className="flex gap-3 items-center mb-4">
+                <input type="file" accept=".csv,.json" onChange={handleFileUpload} />
+                <button
+                  onClick={() => {
+                    const blob = new Blob([exportData()], { type: 'application/json' });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = 'dataqual_dataset_export.json';
+                    a.click();
+                  }}
+                  className="btn-secondary"
+                  style={{ padding: '6px 14px', fontSize: 12, whiteSpace: 'nowrap' }}
+                >
+                  <Icon name="download" size={14} /> Export Dataset (.JSON)
+                </button>
+              </div>
+            </Card>
+
+            <Card>
+              <div className="flex justify-between items-center" style={{ marginBottom: 12 }}>
+                <h4 style={{ margin: 0, color: '#fff', fontSize: 14 }}>Active Loaded Annotators ({annotators.length})</h4>
+                {annotators.length > 0 && (
+                  <button onClick={() => setShowResetModal(true)} style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)', padding: '4px 10px', borderRadius: 6, cursor: 'pointer', fontSize: 11 }}>
+                    Reset Roster
+                  </button>
+                )}
+              </div>
+              <div className="flex-col gap-2" style={{ maxHeight: 240, overflowY: 'auto' }}>
+                {annotators.map(a => (
+                  <div key={a.id} className="flex justify-between items-center" style={{ padding: '8px 12px', background: 'var(--bg-tertiary)', borderRadius: 6, fontSize: 12 }}>
+                    <div className="flex items-center gap-2">
+                      <Avatar src={a.avatar} name={a.name} size={24} />
+                      <span style={{ fontWeight: 600, color: '#fff' }}>{a.name}</span>
+                      <span style={{ color: 'var(--text-muted)' }}>({a.specialization || a.role})</span>
+                    </div>
+                    <button onClick={() => removeAnnotator(a.id)} style={{ background: 'transparent', color: '#ef4444', border: 'none', cursor: 'pointer' }}>
+                      <Icon name="trash" size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </div>
+      );
+    };
+
+    // 10. SETTINGS PAGE (BUG #7 & #8 FIX: Pass thresholds to DataProvider and control webhook state)
+    const SettingsPage = () => {
+      const { tierThresholds, setTierThresholds, webhookEnabled, setWebhookEnabled } = useContext(DataContext);
+
+      return (
+        <div className="flex-col gap-4">
+          <Card>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: 16, color: '#fff' }}>Quality Score Tier Thresholds</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+              <div>
+                <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>Platinum Tier Threshold ({tierThresholds.plat}/100)</label>
+                <input type="range" min="80" max="98" value={tierThresholds.plat} onChange={e => setTierThresholds({ ...tierThresholds, plat: Number(e.target.value) })} style={{ width: '100%', marginTop: 4 }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>Gold Tier Threshold ({tierThresholds.gold}/100)</label>
+                <input type="range" min="65" max="85" value={tierThresholds.gold} onChange={e => setTierThresholds({ ...tierThresholds, gold: Number(e.target.value) })} style={{ width: '100%', marginTop: 4 }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>Silver Tier Threshold ({tierThresholds.silver || 60}/100)</label>
+                <input type="range" min="40" max="70" value={tierThresholds.silver || 60} onChange={e => setTierThresholds({ ...tierThresholds, silver: Number(e.target.value) })} style={{ width: '100%', marginTop: 4 }} />
+              </div>
+            </div>
+          </Card>
+
+          <Card>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: 16, color: '#fff' }}>System Notifications & Webhooks</h3>
+            <div className="flex justify-between items-center" style={{ padding: 12, background: 'var(--bg-tertiary)', borderRadius: 8 }}>
+              <div>
+                <div style={{ fontWeight: 600, color: '#fff', fontSize: 13 }}>Slack / Teams Webhook Alerts</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Send instant alert when Advanced Version drops below 0.80</div>
+              </div>
+              <button
+                onClick={() => setWebhookEnabled(!webhookEnabled)}
+                style={{ background: webhookEnabled ? '#10b981' : 'var(--bg-dark)', color: '#fff', padding: '6px 14px', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer' }}
+              >
+                {webhookEnabled ? '✓ Webhooks Active' : 'Disabled'}
+              </button>
+            </div>
+
+            {/* BUG #6 FIX: Verified link */}
+            <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
+              <a href="https://ubiquitous-lollipop-198399.netlify.app" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', fontWeight: 600, fontSize: 13 }}>
+                Open Main Portfolio Website &rarr;
+              </a>
+            </div>
+          </Card>
+        </div>
+      );
+    };
+
+    // --- CONTENT AREA ---
+    const ContentArea = () => {
+      const { activeTab } = useContext(DataContext);
+      return (
+        <main className="content-area">
+          {activeTab === 'docs' && <DocsTab />}
+          {activeTab === 'dashboard' && <DashboardOverview />}
+          {activeTab === 'ranking' && <RankingLeaderboard />}
+          {activeTab === 'consensus' && <ConsensusTab />}
+          {activeTab === 'smart-sampling' && <SmartSamplingTab />}
+          {activeTab === 'ai-assist' && <AIAssistTab />}
+          {activeTab === 'fairness' && <FairnessTab />}
+          {activeTab === 'data-prog' && <DataProgrammingTab />}
+          {activeTab === 'data-input' && <DataInputPage />}
+          {activeTab === 'settings' && <SettingsPage />}
+        </main>
+      );
+    };
+
+    
+    
+    // --- COMMAND PALETTE MODAL (FINDING #5 FIX) ---
+    const CommandPaletteModal = ({ isOpen, onClose }) => {
+      const { setActiveTab, projects, setActiveProjectId, annotators } = useContext(DataContext);
+      const [paletteSearch, setPaletteSearch] = useState('');
+      const inputRef = useRef(null);
+
+      useEffect(() => {
+        if (isOpen && inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, [isOpen]);
+
+      useEffect(() => {
+        const handleKeyDown = (e) => {
+          if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            e.preventDefault();
+            if (isOpen) onClose();
+            else onClose(true);
+          }
+          if (e.key === 'Escape' && isOpen) onClose();
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+      }, [isOpen, onClose]);
+
+      if (!isOpen) return null;
+
+      const actions = [
+        { label: 'Documentation (PDF Manual)', tab: 'docs', icon: 'code' },
+        { label: 'Dashboard Overview', tab: 'dashboard', icon: 'home' },
+        { label: 'Ranking Leaderboard', tab: 'ranking', icon: 'trophy' },
+        { label: 'Consensus Engine', tab: 'consensus', icon: 'git-merge' },
+        { label: 'Smart Sampling', tab: 'smart-sampling', icon: 'target' },
+        { label: 'AI Assist', tab: 'ai-assist', icon: 'sparkles' },
+        { label: 'Fairness Audit', tab: 'fairness', icon: 'scale' },
+        { label: 'Data Programming', tab: 'data-prog', icon: 'code' },
+        { label: 'Data Input & Management', tab: 'data-input', icon: 'plus-circle' },
+        { label: 'Settings', tab: 'settings', icon: 'settings' }
+      ];
+
+      const filteredActions = actions.filter(a => a.label.toLowerCase().includes(paletteSearch.toLowerCase()));
+
+      return (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(7, 10, 18, 0.85)', backdropFilter: 'blur(12px)',
+          display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: '15vh', zIndex: 10000
+        }} onClick={() => onClose()}>
+          <div className="card" style={{ maxWidth: 540, width: '90%', padding: 16, border: '1px solid var(--accent)', boxShadow: '0 20px 60px rgba(59, 130, 246, 0.3)' }} onClick={e => e.stopPropagation()}>
+            <div className="flex items-center gap-3" style={{ borderBottom: '1px solid var(--border)', paddingBottom: 12, marginBottom: 12 }}>
+              <Icon name="search" size={20} />
+              <input
+                ref={inputRef}
+                type="text"
+                placeholder="Type a command or search tabs... (Press Esc to exit)"
+                value={paletteSearch}
+                onChange={e => setPaletteSearch(e.target.value)}
+                style={{ flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: 14, outline: 'none' }}
+              />
+              <span className="badge badge-purple" style={{ fontSize: 10 }}>Cmd+K</span>
+            </div>
+
+            <div className="flex-col gap-1" style={{ maxHeight: 300, overflowY: 'auto' }}>
+              {filteredActions.map(action => (
+                <button
+                  key={action.tab}
+                  onClick={() => { setActiveTab(action.tab); onClose(); }}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: 'transparent', border: 'none', borderRadius: 6, color: '#fff', cursor: 'pointer', textAlign: 'left' }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-tertiary)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                >
+                  <Icon name={action.icon} size={16} />
+                  <span style={{ fontSize: 13, fontWeight: 600 }}>{action.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // --- INITIAL DEMO POPUP MODAL ---
+    const InitialDemoModal = ({ isOpen, onClose, onLoadDemo }) => {
+      if (!isOpen) return null;
+      return (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(7, 10, 18, 0.88)', backdropFilter: 'blur(12px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000
+        }}>
+          <div className="card" style={{ maxWidth: 480, width: '90%', padding: 28, border: '1px solid var(--accent)', boxShadow: '0 20px 60px rgba(59, 130, 246, 0.25)', textAlignment: 'center' }}>
+            <div className="flex justify-between items-center" style={{ marginBottom: 16 }}>
+              <div className="flex items-center gap-3">
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>
+                  DQ
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: 18, color: '#fff' }}>Welcome to DataQual</h3>
+                  <p style={{ margin: '2px 0 0 0', fontSize: 11, color: 'var(--accent)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Advanced Version</p>
+                </div>
+              </div>
+              <button onClick={onClose} style={{ background: 'transparent', color: 'var(--text-muted)', border: 'none', cursor: 'pointer' }}>
+                <Icon name="x" size={20} />
+              </button>
+            </div>
+
+            <p style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.6, marginBottom: 24 }}>
+              Would you like to load a pre-configured team dataset with 5 enterprise AI projects, Krippendorff's Alpha (&alpha;) agreement metrics, and active learning analytics?
+            </p>
+
+            <div className="flex-col gap-3">
+              <button
+                onClick={onLoadDemo}
+                style={{
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  color: '#fff', padding: '12px 20px', borderRadius: 8, fontSize: 14, fontWeight: 700,
+                  boxShadow: '0 4px 16px rgba(16, 185, 129, 0.35)', border: 'none', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+                }}
+              >
+                <Icon name="sparkles" size={18} />
+                🚀 Load Demo Team Dataset
+              </button>
+              <button
+                onClick={onClose}
+                className="btn-secondary"
+                style={{ padding: '10px 18px', width: '100%', fontSize: 13, justifyContent: 'center' }}
+              >
+                Start with Clean Slate (View Docs)
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // --- MAIN APP ---
+    const AppContent = () => {
+      const { showDemoPopup, setShowDemoPopup, showResetModal, setShowResetModal, loadDemoData, showCommandPalette, setShowCommandPalette } = useContext(DataContext);
+
+      const handleLoadDemo = () => {
+        loadDemoData();
+        setShowDemoPopup(false);
+      };
+
+      return (
+        <div className="app-container">
+          <CommandPaletteModal
+            isOpen={showCommandPalette}
+            onClose={() => setShowCommandPalette(false)}
+          />
+          <InitialDemoModal
+            isOpen={showDemoPopup}
+            onClose={() => setShowDemoPopup(false)}
+            onLoadDemo={handleLoadDemo}
+          />
+          <Sidebar />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <TopBar />
+            <ContentArea />
+          </div>
+        </div>
+      );
+    };
+
+    const App = () => {
+      return (
+        <DataProvider>
+          <AppContent />
+        </DataProvider>
+      );
+    };
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

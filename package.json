@@ -1,0 +1,16 @@
+{
+  "name": "dataqual-v4-workspace",
+  "private": true,
+  "packageManager": "pnpm@11.16.0",
+  "scripts": {
+    "frontend:dev": "pnpm --dir frontend dev",
+    "frontend:build": "pnpm --dir frontend build",
+    "frontend:test": "pnpm --dir frontend test",
+    "frontend:typecheck": "pnpm --dir frontend typecheck",
+    "backend:typecheck": "pyright"
+  },
+  "devDependencies": {
+    "pyright": "1.1.411"
+  }
+}
+

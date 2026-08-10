@@ -1,0 +1,73 @@
+manifest_version: "1.0.0"
+dataset_name: "Crowd-Annotation Results: Requirements Classification, Phase 3"
+release_benchmark: true
+public_artifact_eligible: true
+raw_files_committed: false
+source: "Author-published dataset supporting REFSQ 2020 research"
+source_url: "https://zenodo.org/records/3626185"
+doi: "10.5281/zenodo.3626185"
+download_date: "2026-08-09"
+
+license:
+  identifier: "CC-BY-4.0"
+  authoritative_evidence: "Zenodo record 3626185 metadata applies CC BY 4.0 to the dataset record."
+  redistribution_allowed_with_attribution: true
+  repository_policy: "Do not commit raw feedback text; use the downloader and verified checksums."
+  third_party_content_risk: "The archive contains app-review text. Commit only derived aggregate evidence and adapter code."
+
+citation:
+  creators:
+    - "Martijn van Vliet"
+    - "Eduard C. Groen"
+    - "Fabiano Dalpiaz"
+    - "Sjaak Brinkkemper"
+  paper: "Identifying and Classifying User Requirements in Online Feedback via Crowdsourcing"
+  venue: "REFSQ 2020, LNCS 12045, pages 143-159"
+  proceedings_url: "https://link.springer.com/book/10.1007/978-3-030-44429-7"
+
+files:
+  - name: "Crowd-based annotation.zip"
+    bytes: 2451457
+    upstream_md5: "44b2f2446d0da3ed319833374d7b725f"
+    sha256: "1538ee6b9a1408fd098c06f0ab8e53a9c1867b9ba9769ccaaa712f0dcd2ec0f2"
+    commit_to_repository: false
+  - name: "Phase 3/P3-RawOutput.csv"
+    sha256: "5e7f0ec51e74a8ec7e196123a3e370986396e7c5ed01fbb759f2ca3169102253"
+    role: "individual crowd judgments"
+    commit_to_repository: false
+  - name: "Phase 3/P3-Golden.xlsx"
+    sha256: "d39fbc5357201264589ed3d749500827427498620923dc988a88c13723aee69e"
+    role: "independent researcher reference labels"
+    commit_to_repository: false
+
+conversion:
+  scope: "Phase 3 rows where _golden is exactly FALSE"
+  item_id: "_unit_id"
+  annotator_id: "_worker_id"
+  label: "which_category_best_fits_this_feedback_sentence_ (trimmed and case-folded)"
+  gold_join: "whitespace-normalized reviews to whitespace-normalized P3-Golden Reviews"
+  duplicate_rule: "Drop 27 exact duplicate item-worker-label exports; fail on conflicting repeats."
+  label_domain: ["feature", "none", "performance", "quality", "stability"]
+
+verified_profile:
+  items: 448
+  annotations_after_exact_deduplication: 2674
+  annotators: 121
+  gold_items: 447
+  gold_coverage: 0.9977678571428571
+  annotations_per_item_min: 5
+  annotations_per_item_median: 6.0
+  annotations_per_item_max: 6
+  item_worker_connected_components: 1
+  fraction_items_with_at_least_2_annotations: 1.0
+  fraction_items_with_at_least_3_annotations: 1.0
+  mean_raw_disagreement: 0.3553571428571428
+  fraction_non_unanimous: 0.8816964285714286
+
+phase0b_smoke:
+  crowdkit_version: "1.4.2"
+  majority_vote_accuracy: 0.6621923937360179
+  majority_vote_macro_f1: 0.6301565811575297
+  dawid_skene_accuracy: 0.6331096196868009
+  dawid_skene_macro_f1: 0.6094198113661224
+  interpretation: "Technical validity only. The smoke result does not establish DS superiority; MV performed better on this conversion."

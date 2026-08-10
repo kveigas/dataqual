@@ -1,0 +1,61 @@
+{
+  "status": "pass",
+  "python": "3.12.13 (main, Mar  3 2026, 15:01:35) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "packages": {
+    "fastapi": "0.141.1",
+    "uvicorn": "0.52.1",
+    "pydantic": "2.13.4",
+    "numpy": "2.5.1",
+    "scipy": "1.18.0",
+    "pandas": "3.0.5",
+    "duckdb": "1.5.5",
+    "pyarrow": "25.0.0",
+    "scikit-learn": "1.9.0",
+    "statsmodels": "0.14.6",
+    "typer": "0.27.1",
+    "PyYAML": "6.0.3",
+    "crowd-kit": "1.4.2",
+    "nltk": "3.10.2",
+    "hypothesis": "6.165.2",
+    "pytest": "9.1.1",
+    "pytest-cov": "7.1.0",
+    "httpx": "0.28.1"
+  },
+  "pip_check": {
+    "return_code": 0,
+    "stdout": "No broken requirements found.",
+    "stderr": ""
+  },
+  "checks": {
+    "fastapi_route_count": 5,
+    "pydantic_round_trip": {
+      "project_id": "phase0",
+      "rows": 3
+    },
+    "numpy_sum": 6,
+    "pandas_rows": 3,
+    "arrow_sum": 6,
+    "duckdb_sum_range_4": 6,
+    "yaml_boolean": true,
+    "crowdkit_classes": [
+      "MajorityVote",
+      "DawidSkene",
+      "GLAD",
+      "MACE"
+    ],
+    "module_versions": {
+      "fastapi": "0.141.1",
+      "uvicorn": "0.52.1",
+      "pydantic": "2.13.4",
+      "numpy": "2.5.1",
+      "scipy": "1.18.0",
+      "sklearn": "1.9.0",
+      "statsmodels": "0.14.6",
+      "typer": "0.27.1",
+      "hypothesis": "6.165.2",
+      "pytest": "9.1.1",
+      "httpx": "0.28.1"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "status": "pass",
+  "rows": 10000,
+  "csv_bytes": 1089038,
+  "parquet_bytes": 64037,
+  "csv_write_seconds": 0.016281000105664134,
+  "csv_validation_seconds": 0.028912399895489216,
+  "parquet_write_seconds": 0.031842999858781695,
+  "duckdb_query_seconds": 0.1183512001298368,
+  "arrow_schema": "label_id: int64\nannotations: int64",
+  "api_like_json": [
+    {
+      "label_id": 0,
+      "annotations": 3334
+    },
+    {
+      "label_id": 1,
+      "annotations": 3333
+    },
+    {
+      "label_id": 2,
+      "annotations": 3333
+    }
+  ]
+}

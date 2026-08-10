@@ -1,0 +1,96 @@
+{
+  "status": "pass",
+  "packages": {
+    "krippendorff": {
+      "version": "0.8.2",
+      "metadata_license": null,
+      "classifiers": [
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
+      ],
+      "license_files": [
+        "krippendorff-0.8.2.dist-info/licenses/LICENSE.txt"
+      ],
+      "home_page": "Bug Tracker, https://github.com/pln-fing-udelar/fast-krippendorff/issues"
+    },
+    "nltk": {
+      "version": "3.10.2",
+      "metadata_license": "Apache License, Version 2.0",
+      "classifiers": [
+        "License :: OSI Approved :: Apache Software License"
+      ],
+      "license_files": [
+        "nltk-3.10.2.dist-info/licenses/AUTHORS.md",
+        "nltk-3.10.2.dist-info/licenses/LICENSE.txt",
+        "nltk-3.10.2.dist-info/licenses/README.md"
+      ],
+      "home_page": "https://www.nltk.org/"
+    },
+    "statsmodels": {
+      "version": "0.14.6",
+      "metadata_license": "BSD License",
+      "classifiers": [
+        "License :: OSI Approved :: BSD License"
+      ],
+      "license_files": [
+        "statsmodels-0.14.6.dist-info/licenses/LICENSE.txt",
+        "statsmodels/LICENSE.txt",
+        "statsmodels/stats/libqsturng/LICENSE.txt"
+      ],
+      "home_page": "https://www.statsmodels.org/"
+    }
+  },
+  "fixture": {
+    "rater_by_item": [
+      [
+        0,
+        0,
+        1,
+        1,
+        0
+      ],
+      [
+        0,
+        1,
+        1,
+        1,
+        null
+      ],
+      [
+        0,
+        0,
+        1,
+        0,
+        1
+      ]
+    ],
+    "fleiss_item_by_category_counts_complete_items_only": [
+      [
+        3,
+        0
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        1,
+        2
+      ]
+    ]
+  },
+  "nominal_krippendorff_alpha": 0.20408163265306123,
+  "nltk_nominal_krippendorff_alpha": 0.20408163265306123,
+  "alpha_absolute_difference": 0.0,
+  "fleiss_kappa": 0.33333333333333326,
+  "convention_notes": [
+    "Krippendorff alpha accepts missing ratings and variable ratings per item.",
+    "statsmodels Fleiss kappa consumes item-by-category counts and its documented classical form assumes a constant number of ratings per item.",
+    "The two values are not interchangeable and are not expected to match on the same observations.",
+    "The standalone krippendorff package is GPL-3.0; keep it out of runtime dependencies.",
+    "NLTK is Apache-2.0, matches this fixture exactly, and is the selected independent parity reference."
+  ]
+}

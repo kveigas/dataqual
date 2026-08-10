@@ -1,0 +1,5 @@
+version: "1.0.0"
+weight_uncert: 0.60
+weight_entropy: 0.20
+weight_worker_error: 0.20
+default_cost: 1.0

@@ -1,0 +1,13 @@
+{
+  "include": ["backend/src", "scripts"],
+  "exclude": ["v3_reference", "spikes", "artifacts", "data"],
+  "extraPaths": ["backend/src"],
+  "venvPath": ".",
+  "venv": ".venv",
+  "pythonVersion": "3.12",
+  "typeCheckingMode": "standard",
+  "reportMissingTypeStubs": "none",
+  "reportUnknownMemberType": "none",
+  "reportUnknownArgumentType": "none",
+  "reportUnknownVariableType": "none"
+}

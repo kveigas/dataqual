@@ -1,0 +1,191 @@
+[
+  {
+    "dataset": "Crowd4SDG Albania earthquake MTurk",
+    "conversion_note": "The MTurk table has complete item-worker-label triples. The separate expert table has 907 task IDs but no shared item/media identifier, so it cannot be joined to MTurk items without inventing an order-based mapping.",
+    "items": 907,
+    "annotations": 9070,
+    "annotators": 171,
+    "label_classes": [
+      "Minimal Damage",
+      "Moderate Damage",
+      "No Damage",
+      "Not Relevant",
+      "Severe Damage"
+    ],
+    "labels_per_item": {
+      "min": 10,
+      "median": 10.0,
+      "mean": 10.0,
+      "max": 10
+    },
+    "annotations_per_worker": {
+      "min": 1,
+      "median": 32.0,
+      "mean": 53.04093567251462,
+      "max": 597
+    },
+    "fraction_items_ge_2": 1.0,
+    "fraction_items_ge_3": 1.0,
+    "gold_items": 0,
+    "gold_coverage": 0.0,
+    "annotation_class_distribution": {
+      "Severe Damage": 0.5693495038588754,
+      "Moderate Damage": 0.1699007717750827,
+      "Not Relevant": 0.1420066152149945,
+      "Minimal Damage": 0.06714443219404631,
+      "No Damage": 0.0515986769570011
+    },
+    "gold_class_distribution": {},
+    "mean_raw_disagreement": 0.292502756339581,
+    "fraction_non_unanimous": 0.9051819184123484,
+    "graph": {
+      "connected_components": 1,
+      "largest_component_nodes": 1078,
+      "total_nodes": 1078
+    },
+    "duplicate_item_worker_pairs": 0,
+    "crowdkit_smoke": {
+      "rows_tested": 9070,
+      "items_tested": 907,
+      "majority_vote": {
+        "status": "PASS",
+        "predicted_items": 907
+      },
+      "dawid_skene": {
+        "status": "PASS",
+        "predicted_items": 907
+      }
+    }
+  },
+  {
+    "dataset": "CrowdTruth Open Domain Relation Extraction",
+    "conversion_note": "Each multilabel judgment is transparently expanded into 17 binary relation propositions. input.relation is distant-supervision provenance, not independent expert gold; scores against it are proxy diagnostics only.",
+    "items": 69717,
+    "annotations": 1046044,
+    "annotators": 711,
+    "label_classes": [
+      "0",
+      "1"
+    ],
+    "labels_per_item": {
+      "min": 14,
+      "median": 15.0,
+      "mean": 15.004145330407217,
+      "max": 16
+    },
+    "annotations_per_worker": {
+      "min": 17,
+      "median": 289.0,
+      "mean": 1471.2292545710268,
+      "max": 24208
+    },
+    "fraction_items_ge_2": 1.0,
+    "fraction_items_ge_3": 1.0,
+    "gold_items": 69717,
+    "gold_coverage": 1.0,
+    "annotation_class_distribution": {
+      "0": 0.9259266340612823,
+      "1": 0.07407336593871769
+    },
+    "gold_class_distribution": {
+      "0": 0.969376192320381,
+      "1": 0.03062380767961903
+    },
+    "mean_raw_disagreement": 0.04361368785504936,
+    "fraction_non_unanimous": 0.23778992211368818,
+    "graph": {
+      "connected_components": 2,
+      "largest_component_nodes": 43010,
+      "total_nodes": 70428
+    },
+    "duplicate_item_worker_pairs": 0,
+    "crowdkit_smoke": {
+      "rows_tested": 51000,
+      "items_tested": 3400,
+      "majority_vote": {
+        "status": "PASS",
+        "predicted_items": 3400,
+        "gold_items_scored": 3400,
+        "accuracy": 0.951764705882353,
+        "macro_f1": 0.5970807139244165
+      },
+      "dawid_skene": {
+        "status": "PASS",
+        "predicted_items": 3400,
+        "gold_items_scored": 3400,
+        "accuracy": 0.9111764705882353,
+        "macro_f1": 0.5451605758582503
+      }
+    }
+  },
+  {
+    "dataset": "Requirements annotation Phase 3",
+    "conversion_note": "The selected Phase 3 non-test-question subset has about six judgments per ordinary item and joins by normalized feedback text to the independent researcher Golden workbook. Platform test-question rows are excluded; 27 exact duplicate item-worker-label exports are de-duplicated.",
+    "items": 448,
+    "annotations": 2674,
+    "annotators": 121,
+    "label_classes": [
+      "feature",
+      "none",
+      "performance",
+      "quality",
+      "stability"
+    ],
+    "labels_per_item": {
+      "min": 5,
+      "median": 6.0,
+      "mean": 5.96875,
+      "max": 6
+    },
+    "annotations_per_worker": {
+      "min": 3,
+      "median": 23.0,
+      "mean": 22.09917355371901,
+      "max": 30
+    },
+    "fraction_items_ge_2": 1.0,
+    "fraction_items_ge_3": 1.0,
+    "gold_items": 447,
+    "gold_coverage": 0.9977678571428571,
+    "annotation_class_distribution": {
+      "quality": 0.3275991024682124,
+      "stability": 0.22213911742707554,
+      "feature": 0.15407629020194466,
+      "none": 0.15108451757666416,
+      "performance": 0.14510097232610322
+    },
+    "gold_class_distribution": {
+      "quality": 0.3870246085011186,
+      "none": 0.21252796420581654,
+      "stability": 0.18344519015659955,
+      "feature": 0.14541387024608501,
+      "performance": 0.07158836689038031
+    },
+    "mean_raw_disagreement": 0.3553571428571428,
+    "fraction_non_unanimous": 0.8816964285714286,
+    "graph": {
+      "connected_components": 1,
+      "largest_component_nodes": 569,
+      "total_nodes": 569
+    },
+    "duplicate_item_worker_pairs": 0,
+    "crowdkit_smoke": {
+      "rows_tested": 2674,
+      "items_tested": 448,
+      "majority_vote": {
+        "status": "PASS",
+        "predicted_items": 448,
+        "gold_items_scored": 447,
+        "accuracy": 0.6621923937360179,
+        "macro_f1": 0.6301565811575297
+      },
+      "dawid_skene": {
+        "status": "PASS",
+        "predicted_items": 448,
+        "gold_items_scored": 447,
+        "accuracy": 0.6331096196868009,
+        "macro_f1": 0.6094198113661224
+      }
+    }
+  }
+]

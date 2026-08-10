@@ -1,0 +1,3 @@
+annotation_id,item_id,annotator_id,label,event_version,supersedes_annotation_id,annotation_source
+cycle_001,item_001,worker_01,positive,2,cycle_002,human
+cycle_002,item_001,worker_01,neutral,3,cycle_001,human

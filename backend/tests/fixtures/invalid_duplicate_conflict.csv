@@ -1,0 +1,3 @@
+annotation_id,item_id,annotator_id,label,event_version,annotation_source
+dup_001,item_001,worker_01,positive,1,human
+dup_001,item_001,worker_01,negative,1,human

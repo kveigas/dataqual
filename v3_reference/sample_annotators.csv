@@ -1,0 +1,9 @@
+name,email,role,accuracy,kappa,throughput,avgTime
+Dr. Aris Thorne,aris.thorne@dataqual.ai,lead,98,0.95,420,18
+Siddharth Rao,siddharth.r@dataqual.ai,reviewer,94,0.89,360,22
+Elena Rostova,elena.r@dataqual.ai,annotator,91,0.86,310,25
+Marcus Vance,marcus.v@dataqual.ai,annotator,88,0.81,290,28
+Maya Lin,maya.lin@dataqual.ai,annotator,85,0.77,270,30
+David Kim,david.k@dataqual.ai,annotator,82,0.72,240,35
+Amara Okafor,amara.o@dataqual.ai,reviewer,93,0.88,340,21
+Lucas Morales,lucas.m@dataqual.ai,annotator,78,0.65,210,40

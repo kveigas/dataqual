@@ -1,0 +1,140 @@
+{
+  "status": "pass",
+  "scope_note": "Architecture feasibility observation; not a general performance benchmark.",
+  "seed": 20260809,
+  "row_count": 1000000,
+  "item_count": 200000,
+  "worker_count": 1000,
+  "csv_bytes": 112889040,
+  "parquet_annotation_bytes": 6274114,
+  "parquet_item_bytes": 561420,
+  "generation_seconds": 2.5637328000739217,
+  "csv_write_seconds": 0.3171729000750929,
+  "csv_ingestion_seconds": 0.21219239989295602,
+  "parquet_write_seconds": 1.0014251000247896,
+  "peak_process_rss_bytes_observed": 516329472,
+  "queries": {
+    "annotations_per_worker": {
+      "seconds": 0.10774929984472692,
+      "rows_returned": 1000,
+      "preview": [
+        {
+          "annotator_id": "worker-0000",
+          "n": 1000
+        },
+        {
+          "annotator_id": "worker-0001",
+          "n": 1000
+        },
+        {
+          "annotator_id": "worker-0002",
+          "n": 1000
+        },
+        {
+          "annotator_id": "worker-0003",
+          "n": 1000
+        },
+        {
+          "annotator_id": "worker-0004",
+          "n": 1000
+        }
+      ]
+    },
+    "annotations_per_item": {
+      "seconds": 0.05230069998651743,
+      "rows_returned": 1000,
+      "preview": [
+        {
+          "item_id": "item-0000000",
+          "n": 5
+        },
+        {
+          "item_id": "item-0000001",
+          "n": 5
+        },
+        {
+          "item_id": "item-0000002",
+          "n": 5
+        },
+        {
+          "item_id": "item-0000003",
+          "n": 5
+        },
+        {
+          "item_id": "item-0000004",
+          "n": 5
+        }
+      ]
+    },
+    "class_distribution": {
+      "seconds": 0.01420109998434782,
+      "rows_returned": 3,
+      "preview": [
+        {
+          "label_id": 0,
+          "n": 333335
+        },
+        {
+          "label_id": 1,
+          "n": 333332
+        },
+        {
+          "label_id": 2,
+          "n": 333333
+        }
+      ]
+    },
+    "worker_item_overlap": {
+      "seconds": 0.17333459993824363,
+      "rows_returned": 1000,
+      "preview": [
+        {
+          "annotator_id": "worker-0000",
+          "item_count": 1000
+        },
+        {
+          "annotator_id": "worker-0001",
+          "item_count": 1000
+        },
+        {
+          "annotator_id": "worker-0002",
+          "item_count": 1000
+        },
+        {
+          "annotator_id": "worker-0003",
+          "item_count": 1000
+        },
+        {
+          "annotator_id": "worker-0004",
+          "item_count": 1000
+        }
+      ]
+    },
+    "filter_one_project": {
+      "seconds": 0.01572569995187223,
+      "rows_returned": 1,
+      "preview": [
+        {
+          "n": 1000000
+        }
+      ]
+    },
+    "join_annotations_items": {
+      "seconds": 0.10242979996837676,
+      "rows_returned": 1,
+      "preview": [
+        {
+          "n": 1000000
+        }
+      ]
+    }
+  },
+  "environment": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "python": "3.12.13",
+    "duckdb": "1.5.5",
+    "pyarrow": "25.0.0",
+    "numpy": "2.5.1"
+  }
+}

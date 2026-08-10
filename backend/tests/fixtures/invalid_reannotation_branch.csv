@@ -1,0 +1,4 @@
+annotation_id,item_id,annotator_id,label,event_version,supersedes_annotation_id,annotation_source
+root_001,item_001,worker_01,positive,1,,human
+child_001,item_001,worker_01,neutral,2,root_001,human
+child_002,item_001,worker_01,negative,2,root_001,human

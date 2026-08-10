@@ -1,0 +1,431 @@
+{
+  "environment": {
+    "python": "3.12.13 (main, Mar  3 2026, 15:01:35) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "architecture": "AMD64",
+    "packages": {
+      "crowd-kit": "1.4.2",
+      "numpy": "2.5.1",
+      "pandas": "3.0.5",
+      "scipy": "1.18.0",
+      "scikit-learn": "1.9.0"
+    }
+  },
+  "input_annotations": [
+    {
+      "task": "i1",
+      "worker": "w1",
+      "label": 0
+    },
+    {
+      "task": "i1",
+      "worker": "w2",
+      "label": 0
+    },
+    {
+      "task": "i1",
+      "worker": "w3",
+      "label": 0
+    },
+    {
+      "task": "i1",
+      "worker": "w4",
+      "label": 1
+    },
+    {
+      "task": "i2",
+      "worker": "w1",
+      "label": 0
+    },
+    {
+      "task": "i2",
+      "worker": "w2",
+      "label": 0
+    },
+    {
+      "task": "i2",
+      "worker": "w3",
+      "label": 1
+    },
+    {
+      "task": "i2",
+      "worker": "w4",
+      "label": 0
+    },
+    {
+      "task": "i3",
+      "worker": "w1",
+      "label": 1
+    },
+    {
+      "task": "i3",
+      "worker": "w2",
+      "label": 1
+    },
+    {
+      "task": "i3",
+      "worker": "w3",
+      "label": 1
+    },
+    {
+      "task": "i3",
+      "worker": "w4",
+      "label": 0
+    },
+    {
+      "task": "i4",
+      "worker": "w1",
+      "label": 1
+    },
+    {
+      "task": "i4",
+      "worker": "w2",
+      "label": 1
+    },
+    {
+      "task": "i4",
+      "worker": "w3",
+      "label": 0
+    },
+    {
+      "task": "i4",
+      "worker": "w4",
+      "label": 1
+    },
+    {
+      "task": "i5",
+      "worker": "w1",
+      "label": 0
+    },
+    {
+      "task": "i5",
+      "worker": "w2",
+      "label": 0
+    },
+    {
+      "task": "i5",
+      "worker": "w3",
+      "label": 0
+    },
+    {
+      "task": "i5",
+      "worker": "w4",
+      "label": 0
+    },
+    {
+      "task": "i6",
+      "worker": "w1",
+      "label": 1
+    },
+    {
+      "task": "i6",
+      "worker": "w2",
+      "label": 1
+    },
+    {
+      "task": "i6",
+      "worker": "w3",
+      "label": 1
+    },
+    {
+      "task": "i6",
+      "worker": "w4",
+      "label": 1
+    },
+    {
+      "task": "i7",
+      "worker": "w1",
+      "label": 0
+    },
+    {
+      "task": "i7",
+      "worker": "w2",
+      "label": 1
+    },
+    {
+      "task": "i7",
+      "worker": "w3",
+      "label": 0
+    },
+    {
+      "task": "i7",
+      "worker": "w4",
+      "label": 0
+    },
+    {
+      "task": "i8",
+      "worker": "w1",
+      "label": 1
+    },
+    {
+      "task": "i8",
+      "worker": "w2",
+      "label": 0
+    },
+    {
+      "task": "i8",
+      "worker": "w3",
+      "label": 1
+    },
+    {
+      "task": "i8",
+      "worker": "w4",
+      "label": 1
+    }
+  ],
+  "signatures": {
+    "MajorityVote": "(default_skill: Optional[float] = None, on_missing_skill: str = 'error') -> None",
+    "DawidSkene": "(n_iter: int = 100, tol: float = 1e-05, initial_error_strategy: Optional[Literal['assign', 'addition']] = None) -> None",
+    "GLAD": "(n_iter: int = 100, tol: float = 1e-05, silent: bool = True, labels_priors: Optional[ForwardRef('pd.Series[Any]')] = None, alphas_priors_mean: Optional[ForwardRef('pd.Series[Any]')] = None, betas_priors_mean: Optional[ForwardRef('pd.Series[Any]')] = None, m_step_max_iter: int = 25, m_step_tol: float = 0.01) -> None",
+    "MACE": "(n_restarts: int = 10, n_iter: int = 50, method: str = 'vb', smoothing: float = 0.1, default_noise: float = 0.5, alpha: float = 0.5, beta: float = 0.5, random_state: int = 0, verbose: int = 0) -> None"
+  },
+  "callability": {
+    "MajorityVote": {
+      "status": "pass",
+      "configuration": {},
+      "labels": {
+        "i1": 0,
+        "i2": 0,
+        "i3": 1,
+        "i4": 1,
+        "i5": 0,
+        "i6": 1,
+        "i7": 0,
+        "i8": 1
+      },
+      "warnings": []
+    },
+    "DawidSkene": {
+      "status": "pass",
+      "configuration": {
+        "n_iter": 100,
+        "tol": 1e-09
+      },
+      "labels": {
+        "i1": 0,
+        "i2": 0,
+        "i3": 1,
+        "i4": 1,
+        "i5": 0,
+        "i6": 1,
+        "i7": 0,
+        "i8": 1
+      },
+      "warnings": []
+    },
+    "GLAD": {
+      "status": "pass",
+      "configuration": {
+        "n_iter": 10,
+        "tol": 1e-05
+      },
+      "labels": {
+        "i1": 0,
+        "i2": 0,
+        "i3": 1,
+        "i4": 1,
+        "i5": 0,
+        "i6": 1,
+        "i7": 0,
+        "i8": 1
+      },
+      "warnings": []
+    },
+    "MACE": {
+      "status": "pass",
+      "configuration": {
+        "n_restarts": 2,
+        "n_iter": 10,
+        "random_state": 0
+      },
+      "labels": {
+        "i1": 0,
+        "i2": 0,
+        "i3": 1,
+        "i4": 1,
+        "i5": 0,
+        "i6": 1,
+        "i7": 0,
+        "i8": 1
+      },
+      "warnings": []
+    }
+  },
+  "dawid_skene_reference": {
+    "labels": {
+      "i1": 0,
+      "i2": 0,
+      "i3": 1,
+      "i4": 1,
+      "i5": 0,
+      "i6": 1,
+      "i7": 0,
+      "i8": 1
+    },
+    "probabilities": {
+      "i1": {
+        "0": 0.9999999991742778,
+        "1": 8.257221723992757e-10
+      },
+      "i2": {
+        "0": 0.9999999991742778,
+        "1": 8.257221723992757e-10
+      },
+      "i3": {
+        "0": 8.257221723992757e-10,
+        "1": 0.9999999991742778
+      },
+      "i4": {
+        "0": 8.257221723992757e-10,
+        "1": 0.9999999991742778
+      },
+      "i5": {
+        "0": 0.9999999999082532,
+        "1": 1e-10
+      },
+      "i6": {
+        "0": 1e-10,
+        "1": 0.9999999999082532
+      },
+      "i7": {
+        "0": 0.9999999991742778,
+        "1": 8.257221723992757e-10
+      },
+      "i8": {
+        "0": 8.257221723992757e-10,
+        "1": 0.9999999991742778
+      }
+    },
+    "priors": {
+      "0": 0.5,
+      "1": 0.5
+    },
+    "errors": [
+      {
+        "worker": "w1",
+        "observed_label": 0,
+        "true_label": 0,
+        "probability": 0.9999999993577717
+      },
+      {
+        "worker": "w1",
+        "observed_label": 0,
+        "true_label": 1,
+        "probability": 6.422283565438327e-10
+      },
+      {
+        "worker": "w1",
+        "observed_label": 1,
+        "true_label": 0,
+        "probability": 6.422283565438327e-10
+      },
+      {
+        "worker": "w1",
+        "observed_label": 1,
+        "true_label": 1,
+        "probability": 0.9999999993577717
+      },
+      {
+        "worker": "w2",
+        "observed_label": 0,
+        "true_label": 0,
+        "probability": 0.7499999997706328
+      },
+      {
+        "worker": "w2",
+        "observed_label": 0,
+        "true_label": 1,
+        "probability": 0.25000000022936725
+      },
+      {
+        "worker": "w2",
+        "observed_label": 1,
+        "true_label": 0,
+        "probability": 0.25000000022936725
+      },
+      {
+        "worker": "w2",
+        "observed_label": 1,
+        "true_label": 1,
+        "probability": 0.7499999997706328
+      },
+      {
+        "worker": "w3",
+        "observed_label": 0,
+        "true_label": 0,
+        "probability": 0.7499999997706328
+      },
+      {
+        "worker": "w3",
+        "observed_label": 0,
+        "true_label": 1,
+        "probability": 0.25000000022936725
+      },
+      {
+        "worker": "w3",
+        "observed_label": 1,
+        "true_label": 0,
+        "probability": 0.25000000022936725
+      },
+      {
+        "worker": "w3",
+        "observed_label": 1,
+        "true_label": 1,
+        "probability": 0.7499999997706328
+      },
+      {
+        "worker": "w4",
+        "observed_label": 0,
+        "true_label": 0,
+        "probability": 0.7499999997706328
+      },
+      {
+        "worker": "w4",
+        "observed_label": 0,
+        "true_label": 1,
+        "probability": 0.25000000022936725
+      },
+      {
+        "worker": "w4",
+        "observed_label": 1,
+        "true_label": 0,
+        "probability": 0.25000000022936725
+      },
+      {
+        "worker": "w4",
+        "observed_label": 1,
+        "true_label": 1,
+        "probability": 0.7499999997706328
+      }
+    ],
+    "loss_history": [
+      -1.1394562314135852,
+      -1.123036131717347,
+      -1.1171803997536405,
+      -1.1155031588911835,
+      -1.115056197375384,
+      -1.1149394747806014,
+      -1.1149091561323632,
+      -1.1149012918857475,
+      -1.1148992527476282,
+      -1.114898724064754,
+      -1.1148985869976518,
+      -1.1148985514616572,
+      -1.1148985422486162,
+      -1.11489853986005,
+      -1.1148985392294088
+    ],
+    "iterations_observed": 15,
+    "note": "Crowd-Kit exposes loss history but no separate convergence flag."
+  },
+  "relevance_2_loader": {
+    "status": "pass",
+    "annotation_rows": 475536,
+    "ground_truth_rows": 10079,
+    "columns": [
+      "worker",
+      "task",
+      "label"
+    ]
+  }
+}
