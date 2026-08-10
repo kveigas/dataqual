@@ -78,7 +78,7 @@ function DatasetView({ dataset }: { dataset: Dataset }) {
   return <div className="dataset-detail">
     <div className="metrics" aria-label="Evidence overview">{metrics.map(([label, value, explanation]) => <div className="metric" key={label} title={String(explanation)}><strong>{value}</strong><span>{label}</span></div>)}</div>
     
-    {/* Navigation Tabs for Phase 5 */}
+    {/* Navigation Tabs */}
     <nav className="tabs" style={{ display: "flex", gap: "0.5rem", marginBottom: "1.5rem", borderBottom: "1px solid #e5e7eb", paddingBottom: "0.5rem", flexWrap: "wrap" }}>
       <button type="button" className={`tab-button ${activeTab === "overview" ? "active" : ""}`} onClick={() => setActiveTab("overview")}>
         Coverage &amp; Agreement
@@ -93,10 +93,10 @@ function DatasetView({ dataset }: { dataset: Dataset }) {
         Disagreement Diagnostics
       </button>
       <button type="button" className={`tab-button ${activeTab === "review_queue" ? "active" : ""}`} onClick={() => setActiveTab("review_queue")}>
-        Review Queue (Phase 5)
+        Review Queue
       </button>
       <button type="button" className={`tab-button ${activeTab === "benchmark" ? "active" : ""}`} onClick={() => setActiveTab("benchmark")}>
-        Benchmark Research (Phase 5)
+        Benchmarks
       </button>
     </nav>
 
@@ -115,7 +115,7 @@ function DatasetView({ dataset }: { dataset: Dataset }) {
     {activeTab === "benchmark" && <BenchmarkView />}
 
     <section style={{ marginTop: "1.5rem" }}><h3>Provenance</h3><dl className="provenance"><div><dt>Analysis run</dt><dd><code>{evidence.data.analysis_run_id}</code></dd></div><div><dt>Raw SHA-256</dt><dd><code>{provenance.data.raw_sha256}</code></dd></div><div><dt>Canonical SHA-256</dt><dd><code>{provenance.data.canonical_snapshot_checksum}</code></dd></div><div><dt>Transformation</dt><dd>{provenance.data.transformation_version}</dd></div></dl>{provenance.data.warnings.map((warning) => <p className="warning" key={warning}>{warning}</p>)}</section>
-    <p className="scope-note">Phase 5 provides review queue prioritization and synthetic benchmarking. Prioritization scores remain conditional on evidence and method assumptions.</p>
+    <p className="scope-note">Prioritization scores and synthetic benchmark evaluations remain conditional on evidence and method assumptions.</p>
   </div>;
 }
 
@@ -123,9 +123,9 @@ function Workspace() {
   const datasets = useQuery({ queryKey: ["datasets"], queryFn: api.datasets });
   const [selected, setSelected] = useState<string | null>(null);
   const chosen = datasets.data?.find((dataset) => dataset.dataset_id === selected) ?? datasets.data?.[0];
-  return <section className="panel workspace" aria-labelledby="workspace-title"><div className="eyebrow">Canonical evidence</div><h2 id="workspace-title">Datasets</h2>{datasets.isPending && <p role="status">Loading datasets…</p>}{datasets.isError && <p role="alert" className="error">Datasets could not be loaded.</p>}{datasets.data?.length === 0 && <p>No canonical datasets yet. Import the deterministic fixture to begin.</p>}{(datasets.data?.length ?? 0) > 0 && <label>Dataset<select value={chosen?.dataset_id} onChange={(event) => setSelected(event.target.value)}>{datasets.data?.map((dataset) => <option key={dataset.dataset_id} value={dataset.dataset_id}>{dataset.dataset_name} · {dataset.dataset_version}</option>)}</select></label>}{chosen && <DatasetView dataset={chosen} />}</section>;
+  return <section className="panel workspace" aria-labelledby="workspace-title"><div className="eyebrow">Canonical evidence</div><h2 id="workspace-title">Datasets</h2>{datasets.isPending && <p role="status">Loading datasets…</p>}{datasets.isError && <p role="alert" className="error">Datasets could not be loaded.</p>}{datasets.data?.length === 0 && <p>No canonical datasets yet. Import the deterministic fixture to begin.</p>}{(datasets.data?.length ?? 0) > 0 && <label>Dataset<select value={chosen?.dataset_id} onChange={(event) => setSelected(event.target.value)}>{datasets.data?.map((dataset) => <option key={dataset.dataset_id} value={dataset.dataset_name}>{dataset.dataset_name} · {dataset.dataset_version}</option>)}</select></label>}{chosen && <DatasetView dataset={chosen} />}</section>;
 }
 
 export function App() {
-  return <><header><div><span className="mark">DQ</span><strong>DataQual v4</strong></div><span className="phase">Phase 5 · Simulation &amp; Review Prioritization</span></header><main id="main"><section className="intro"><div className="eyebrow">Research-grade annotation evidence</div><h1>Evidence before quality claims.</h1><p>DataQual traces coverage, agreement, consensus sensitivity, annotator intelligence, and review prioritization back to immutable annotation events.</p></section><div className="layout"><ImportPanel /><Workspace /></div></main><footer>DataQual v4 · Phase 5 · Review prioritization and synthetic benchmarking remain conditional on evidence and method assumptions.</footer></>;
+  return <><header><div><span className="mark">DQ</span><strong>DataQual v4</strong></div><span className="phase">v4.0.0-rc1 · Research Portfolio Release</span></header><main id="main"><section className="intro"><div className="eyebrow">Research-grade annotation evidence</div><h1>Evidence before quality claims.</h1><p>DataQual traces coverage, agreement, consensus sensitivity, annotator intelligence, and review prioritization back to immutable annotation events.</p></section><div className="layout"><ImportPanel /><Workspace /></div></main><footer>DataQual v4 · v4.0.0-rc1 · Review prioritization and synthetic benchmarking remain conditional on evidence and method assumptions.</footer></>;
 }

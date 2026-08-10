@@ -9,7 +9,7 @@ function renderApp() {
   return render(<QueryClientProvider client={client}><App /></QueryClientProvider>);
 }
 
-test("explains the truthful Phase 4 scope and empty state", async () => {
+test("explains the truthful scope and empty state", async () => {
   vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify([]), { status: 200 }));
   renderApp();
   expect(screen.getByRole("heading", { name: "Evidence before quality claims." })).toBeVisible();
