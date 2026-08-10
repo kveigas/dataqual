@@ -334,8 +334,19 @@ export interface QualityFlag {
   explanation: string;
 }
 
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined) || "";
+
+function getUrl(path: string): string {
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    return path;
+  }
+  const cleanBase = API_BASE_URL.replace(/\/+$/, "");
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  return `${cleanBase}${cleanPath}`;
+}
+
 async function request<T>(path: string, schema: z.ZodType<T>, init?: RequestInit): Promise<T> {
-  const response = await fetch(path, init);
+  const response = await fetch(getUrl(path), init);
   const body: unknown = await response.json();
   if (!response.ok) {
     const message = z.object({ error: z.object({ message: z.string() }) }).safeParse(body);
@@ -345,7 +356,7 @@ async function request<T>(path: string, schema: z.ZodType<T>, init?: RequestInit
 }
 
 async function rawRequest<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(path, init);
+  const response = await fetch(getUrl(path), init);
   const body: unknown = await response.json();
   if (!response.ok) {
     const message = z.object({ error: z.object({ message: z.string() }) }).safeParse(body);
