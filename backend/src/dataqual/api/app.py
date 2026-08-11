@@ -95,6 +95,61 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def health() -> dict[str, str]:
         return {"status": "ok", "version": __version__}
 
+    @app.post("/api/v1/demo/bootstrap")
+    def bootstrap_demo() -> dict[str, Any]:
+        existing_datasets = repository.list_datasets()
+        for ds in existing_datasets:
+            if ds.dataset_name == "Synthetic Demo Dataset":
+                return {
+                    "status": "ready",
+                    "dataset_id": ds.dataset_id,
+                    "dataset_name": ds.dataset_name,
+                    "dataset_version": ds.dataset_version,
+                    "is_existing": True,
+                }
+
+        from dataqual.simulation import SyntheticDatasetGenerator
+        from dataqual.simulation.scenarios import get_pre_registered_scenario_config
+        from dataqual.storage.repository import _write_models
+
+        cfg = get_pre_registered_scenario_config("S12", world_seed=42)
+        generator = SyntheticDatasetGenerator(cfg)
+        annos, golds, _hidden_truth = generator.generate()
+
+        lines = ["annotation_id,item_id,annotator_id,label,event_version,annotation_source"]
+        for a in annos:
+            lines.append(f"{a.annotation_id},{a.item_id},{a.annotator_id},{a.label},1,human")
+        csv_bytes = "\n".join(lines).encode("utf-8")
+
+        import_cfg = ImportConfig(
+            project_id="demo_s12",
+            project_name="Synthetic Demo Project",
+            label_domain_id="sentiment_v1",
+            labels=["positive", "neutral", "negative"],
+            dataset_name="Synthetic Demo Dataset",
+            dataset_version="1.0.0",
+            source_uri="synthetic://s12-demo",
+            license="CC0-1.0",
+            redistribution_allowed=True,
+        )
+
+        record = imports.import_bytes("demo_s12.csv", csv_bytes, import_cfg)
+        assert record.dataset_id is not None
+
+        if golds:
+            dataset_dir = repository.dataset_root / record.dataset_id
+            _write_models(dataset_dir / "gold_labels.parquet", golds)
+
+        return {
+            "status": "ready",
+            "dataset_id": record.dataset_id,
+            "dataset_name": "Synthetic Demo Dataset",
+            "dataset_version": "1.0.0",
+            "imported_events": record.accepted_rows,
+            "imported_golds": len(golds),
+            "is_existing": False,
+        }
+
     @app.post("/api/v1/imports", response_model=ImportRecord)
     async def create_import(
         file: Annotated[UploadFile, File()],

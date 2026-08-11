@@ -5,6 +5,16 @@
 
 DataQual is an evidence-backed system for preserving, validating, and analyzing crowdsourced and human-in-the-loop annotation data. It combines an immutable storage foundation, agreement statistics (Krippendorff's Alpha), multi-class Dawid–Skene consensus EM, Bayesian worker reliability, disagreement diagnostics, and review queue prioritization.
 
+## Live Interactive Demo
+
+Try DataQual v4 live in your browser:  
+**https://kveigas.github.io/dataqual/**
+
+- **Deterministic Synthetic Demo**: Click **Explore Demo Dataset** to instantly bootstrap and analyze a 100-item, 12-annotator synthetic environment (Scenario S12, seed 42).
+- **Genuine Analytics Engine**: All agreement metrics, Dawid–Skene consensus, annotator intelligence profiles, quality flags, and review prioritization queues are computed live by the DataQual API service.
+- **Synthetic Benchmark Research**: Synthetic simulation benchmark metrics (AUREC@20%) compare prioritization strategies under controlled ground truth.
+- **Data Isolation**: User-uploaded CSV/JSON datasets remain strictly isolated from demo fixtures.
+
 ## Key Capabilities
 
 - **Immutable Evidence Storage**: SHA-256 intake checksums, DuckDB catalog, Parquet snapshot storage.

@@ -9,12 +9,35 @@ function renderApp() {
   return render(<QueryClientProvider client={client}><App /></QueryClientProvider>);
 }
 
-test("explains the truthful scope and empty state", async () => {
+test("explains the truthful scope and presents demo CTA button when empty", async () => {
   vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify([]), { status: 200 }));
   renderApp();
   expect(screen.getByRole("heading", { name: "Evidence before quality claims." })).toBeVisible();
   expect(screen.getByText(/remain conditional on evidence/i)).toBeVisible();
-  await waitFor(() => expect(screen.getByText(/No canonical datasets yet/i)).toBeVisible());
+  await waitFor(() => expect(screen.getByRole("button", { name: "Explore Demo Dataset" })).toBeVisible());
+});
+
+test("triggers demo bootstrap and selects synthetic demo dataset", async () => {
+  let bootstrapped = false;
+  vi.spyOn(globalThis, "fetch").mockImplementation(async (input, init) => {
+    const url = String(input);
+    if (url.includes("/api/v1/demo/bootstrap") && init?.method === "POST") {
+      bootstrapped = true;
+      return new Response(JSON.stringify({ status: "ready", dataset_id: "ds_demo_1", dataset_name: "Synthetic Demo Dataset", dataset_version: "1.0.0" }), { status: 200 });
+    }
+    if (url.includes("/api/v1/datasets")) {
+      if (!bootstrapped) {
+        return new Response(JSON.stringify([]), { status: 200 });
+      }
+      return new Response(JSON.stringify([{ schema_version: "4.0.0", dataset_id: "ds_demo_1", dataset_name: "Synthetic Demo Dataset", dataset_version: "1.0.0", project_id: "demo", import_id: "imp_demo", created_at: "2026-08-11T00:00:00Z", canonical_snapshot_checksum: "a".repeat(64) }]), { status: 200 });
+    }
+    return new Response(JSON.stringify({}), { status: 200 });
+  });
+
+  renderApp();
+  await waitFor(() => expect(screen.getByRole("button", { name: "Explore Demo Dataset" })).toBeVisible());
+  fireEvent.click(screen.getByRole("button", { name: "Explore Demo Dataset" }));
+  await waitFor(() => expect(screen.getByText("SYNTHETIC DEMO DATA")).toBeVisible());
 });
 
 test("shows a structured loading failure", async () => {

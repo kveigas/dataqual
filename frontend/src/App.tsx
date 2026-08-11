@@ -120,10 +120,115 @@ function DatasetView({ dataset }: { dataset: Dataset }) {
 }
 
 function Workspace() {
+  const queryClient = useQueryClient();
   const datasets = useQuery({ queryKey: ["datasets"], queryFn: api.datasets });
   const [selected, setSelected] = useState<string | null>(null);
+
+  const demoMutation = useMutation({
+    mutationFn: api.bootstrapDemo,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["datasets"] });
+      setSelected(data.dataset_id);
+    },
+  });
+
   const chosen = datasets.data?.find((dataset) => dataset.dataset_id === selected) ?? datasets.data?.[0];
-  return <section className="panel workspace" aria-labelledby="workspace-title"><div className="eyebrow">Canonical evidence</div><h2 id="workspace-title">Datasets</h2>{datasets.isPending && <p role="status">Loading datasets…</p>}{datasets.isError && <p role="alert" className="error">Datasets could not be loaded.</p>}{datasets.data?.length === 0 && <p>No canonical datasets yet. Import the deterministic fixture to begin.</p>}{(datasets.data?.length ?? 0) > 0 && <label>Dataset<select value={chosen?.dataset_id} onChange={(event) => setSelected(event.target.value)}>{datasets.data?.map((dataset) => <option key={dataset.dataset_id} value={dataset.dataset_name}>{dataset.dataset_name} · {dataset.dataset_version}</option>)}</select></label>}{chosen && <DatasetView dataset={chosen} />}</section>;
+  const isDemo = chosen?.dataset_name === "Synthetic Demo Dataset";
+
+  return (
+    <section className="panel workspace" aria-labelledby="workspace-title">
+      <div className="eyebrow">Canonical evidence</div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+        <h2 id="workspace-title" style={{ margin: 0 }}>Datasets</h2>
+        {isDemo && (
+          <span
+            className="demo-badge"
+            style={{
+              backgroundColor: "#eff6ff",
+              color: "#1e40af",
+              padding: "0.25rem 0.75rem",
+              borderRadius: "9999px",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              border: "1px solid #bfdbfe",
+            }}
+          >
+            SYNTHETIC DEMO DATA
+          </span>
+        )}
+      </div>
+
+      {datasets.isPending && <p role="status">Loading datasets…</p>}
+      {datasets.isError && <p role="alert" className="error">Datasets could not be loaded.</p>}
+
+      {datasets.data?.length === 0 && (
+        <div style={{ padding: "1.5rem", backgroundColor: "#f9fafb", borderRadius: "0.5rem", border: "1px solid #e5e7eb", textAlign: "center", marginBottom: "1.5rem" }}>
+          <h3 style={{ marginTop: 0, marginBottom: "0.5rem" }}>No Canonical Datasets Yet</h3>
+          <p style={{ color: "#4b5563", marginBottom: "1rem" }}>
+            Explore DataQual's evidence engine using a deterministic synthetic dataset, or upload your own CSV/JSON annotation events.
+          </p>
+
+          {demoMutation.isPending ? (
+            <p role="status" style={{ fontWeight: 600, color: "#2563eb" }}>
+              Starting DataQual demo environment…
+            </p>
+          ) : demoMutation.isError ? (
+            <div>
+              <p role="alert" className="error" style={{ color: "#dc2626", marginBottom: "0.75rem" }}>
+                Demo environment start failed: {demoMutation.error.message}
+              </p>
+              <button
+                type="button"
+                className="button-primary"
+                onClick={() => demoMutation.mutate()}
+                style={{ backgroundColor: "#2563eb", color: "#ffffff", padding: "0.5rem 1rem", borderRadius: "0.375rem", border: "none", cursor: "pointer" }}
+              >
+                Retry Demo Bootstrap
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className="button-primary"
+              onClick={() => demoMutation.mutate()}
+              style={{ backgroundColor: "#2563eb", color: "#ffffff", padding: "0.625rem 1.25rem", fontWeight: 600, borderRadius: "0.375rem", border: "none", cursor: "pointer" }}
+            >
+              Explore Demo Dataset
+            </button>
+          )}
+        </div>
+      )}
+
+      {(datasets.data?.length ?? 0) > 0 && (
+        <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "1rem" }}>
+          <label style={{ flex: 1 }}>
+            Dataset
+            <select
+              value={chosen?.dataset_id}
+              onChange={(event) => setSelected(event.target.value)}
+            >
+              {datasets.data?.map((dataset) => (
+                <option key={dataset.dataset_id} value={dataset.dataset_id}>
+                  {dataset.dataset_name} · {dataset.dataset_version}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            type="button"
+            className="button-secondary"
+            onClick={() => demoMutation.mutate()}
+            disabled={demoMutation.isPending}
+            style={{ fontSize: "0.875rem", padding: "0.375rem 0.75rem" }}
+          >
+            {demoMutation.isPending ? "Loading Demo…" : "Load Synthetic Demo"}
+          </button>
+        </div>
+      )}
+
+      {chosen && <DatasetView dataset={chosen} />}
+    </section>
+  );
 }
 
 export function App() {

@@ -420,7 +420,19 @@ export interface BenchmarkManifestResponse {
   };
 }
 
+const DemoBootstrapResponse = z.object({
+  status: z.string(),
+  dataset_id: z.string(),
+  dataset_name: z.string(),
+  dataset_version: z.string(),
+  is_existing: z.boolean().optional(),
+  imported_events: z.number().optional(),
+  imported_golds: z.number().optional(),
+});
+export type DemoBootstrapResponse = z.infer<typeof DemoBootstrapResponse>;
+
 export const api = {
+  bootstrapDemo: () => request("/api/v1/demo/bootstrap", DemoBootstrapResponse, { method: "POST" }),
   datasets: () => request("/api/v1/datasets", z.array(Dataset)),
   summary: (id: string) => request(`/api/v1/datasets/${encodeURIComponent(id)}/summary`, Summary),
   provenance: (id: string) =>
