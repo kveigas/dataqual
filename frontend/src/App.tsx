@@ -163,8 +163,8 @@ function Workspace() {
 
       {datasets.data?.length === 0 && (
         <div style={{ padding: "1.5rem", backgroundColor: "#f9fafb", borderRadius: "0.5rem", border: "1px solid #e5e7eb", textAlign: "center", marginBottom: "1.5rem" }}>
-          <h3 style={{ marginTop: 0, marginBottom: "0.5rem" }}>No Canonical Datasets Yet</h3>
-          <p style={{ color: "#4b5563", marginBottom: "1rem" }}>
+          <h3 style={{ marginTop: 0, marginBottom: "0.5rem", color: "#111827" }}>No Canonical Datasets Yet</h3>
+          <p style={{ color: "#374151", marginBottom: "1rem" }}>
             Explore DataQual's evidence engine using a deterministic synthetic dataset, or upload your own CSV/JSON annotation events.
           </p>
 
