@@ -1,6 +1,7 @@
 .venv/
 node_modules/
 frontend/dist/
+frontend/public/demo-snapshot/
 frontend/coverage/
 frontend/test-results/
 coverage/

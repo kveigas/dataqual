@@ -39,6 +39,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # The hosted API sleeps when idle. The demo's responses are pre-computed by the same
+      # analysis code and shipped with the site, so the public demo renders instantly.
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.12.3"
+          enable-cache: true
+
+      - name: Build instant-demo snapshot
+        run: |
+          uv python install 3.12
+          uv sync --all-groups --locked
+          uv run python scripts/build_demo_snapshot.py --output frontend/public/demo-snapshot
+
       - name: Build frontend
         env:
           VITE_API_BASE_URL: https://dataqual-api.onrender.com
