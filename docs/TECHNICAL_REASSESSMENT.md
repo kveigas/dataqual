@@ -1,6 +1,6 @@
 # DataQual: technical reassessment and local improvements
 
-Review window: 29–30 September 2026. Starting code: `cdf484c`, the complete v4 RC1 checkout, not the older v3 reference or Downloads Phase 3 snapshot. Changes are local, uncommitted, and undeployed. Existing unrelated portfolio screenshots/scripts were preserved.
+Review window: 29–30 September 2026. Starting code: `cdf484c`, the complete v4 RC1 checkout, not the older v3 reference or Downloads Phase 3 snapshot. Changes stayed local for review until their release on 1 October 2026 ([kveigas/dataqual#1](https://github.com/kveigas/dataqual/pull/1)). Existing unrelated portfolio screenshots/scripts were preserved.
 
 ## Verdict
 
@@ -84,7 +84,7 @@ The local review bundle outside this repository contains all 12 JSON manifests, 
 
 ## Addendum — second pass, 30 September – 1 October 2026
 
-Still local, uncommitted and undeployed.
+Released 1 October 2026 ([kveigas/dataqual#1](https://github.com/kveigas/dataqual/pull/1)).
 
 ### Defects found and fixed
 
@@ -124,3 +124,22 @@ the plan's additional-label count is optimistic.
 
 Backend 127 tests, 91.52% branch-inclusive coverage (gate 90%), ruff, ruff format, pyright clean. Frontend 12 unit tests,
 typecheck, build; Label collection view verified in a browser on the synthetic demo with no console errors.
+
+---
+
+## Addendum — instant public demo, 1 October 2026
+
+**Problem.** The API runs on Render's free tier, which sleeps after 15 minutes idle; a measured cold start took 32 s,
+during which a first-time visitor saw only a loading message.
+
+**Design.** The demo dataset is deterministic, so `scripts/build_demo_snapshot.py` imports it during the Pages build with
+the same analysis code and stores every response the demo views and controls can request: 57 responses, including every
+label-plan and benchmark option and 10 complete review runs, in 3.1 MB. The frontend answers demo requests from this
+snapshot (review-queue paging and search are applied client-side exactly as the API does) and wakes the live API in the
+background for imports and uploaded datasets, which join the list once it answers.
+
+**Verification.** Tests assert that the snapshot covers every demo view and option, that sampled responses (agreement,
+annotators, a label plan) equal a freshly bootstrapped API with identity fields masked, and that the builder's options
+match the frontend menus. Backend 131 tests, 92.25% branch-inclusive coverage, Ruff, Ruff
+format and Pyright clean; frontend 17 unit tests, typecheck, build. In a browser with the API unreachable, the
+workspace rendered in 0.2 s and every view and action responded in under 0.2 s.

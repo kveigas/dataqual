@@ -20,7 +20,10 @@ function ImportPanel() {
       if (!file) throw new Error("Choose a CSV or JSON source file.");
       return api.importFile(file, JSON.parse(config) as object);
     },
-    onSuccess: () => client.invalidateQueries({ queryKey: ["datasets"] }),
+    onSuccess: () => {
+      client.invalidateQueries({ queryKey: ["datasets"] });
+      client.invalidateQueries({ queryKey: ["live-datasets"] });
+    },
   });
   let configSyntaxValid = true;
   try { JSON.parse(config); } catch { configSyntaxValid = false; }
@@ -34,6 +37,7 @@ function ImportPanel() {
       <div className="preflight" aria-live="polite"><strong>Preflight</strong><span>{file ? `${file.name} · ${file.size} bytes` : "Choose a CSV or JSON source."}</span><span>Configuration JSON: {configSyntaxValid ? "valid syntax" : "invalid syntax"}</span><small>Canonical schema validation runs atomically when submitted.</small></div>
       <button type="submit" disabled={mutation.isPending || !configSyntaxValid}>Import atomically</button>
     </form>
+    {mutation.isPending && <p role="status">Importing… If the analysis server was idle, it can take up to a minute to start.</p>}
     {mutation.isError && <p role="alert" className="error">{mutation.error.message}</p>}
     {mutation.data && <div className={`notice ${mutation.data.status}`} role="status"><strong>{mutation.data.status === "accepted" ? "Import accepted" : "Import rejected"}</strong><span>{mutation.data.input_rows} input · {mutation.data.accepted_rows} accepted · {mutation.data.rejected_rows} rejected</span>{mutation.data.issues.map((issue) => <span key={`${issue.code}-${issue.message}`}>{issue.source_row_number ? `Row ${issue.source_row_number} · ` : ""}{issue.field ? `${issue.field} · ` : ""}{issue.code}: {issue.message}</span>)}</div>}
   </section>;
@@ -139,13 +143,20 @@ function DatasetView({ dataset }: { dataset: Dataset }) {
 
 function Workspace() {
   const queryClient = useQueryClient();
-  const datasets = useQuery({ queryKey: ["datasets"], queryFn: api.datasets });
+  const primary = useQuery({ queryKey: ["datasets"], queryFn: api.datasets });
+  // The instant demo renders first; user datasets join once the live API answers.
+  const live = useQuery({ queryKey: ["live-datasets"], queryFn: api.liveDatasets, retry: 4, retryDelay: 15000 });
+  const datasets = {
+    ...primary,
+    data: primary.data && [...primary.data, ...(live.data ?? []).filter((d) => !primary.data.some((p) => p.dataset_id === d.dataset_id))],
+  };
   const [selected, setSelected] = useState<string | null>(null);
 
   const demoMutation = useMutation({
     mutationFn: api.bootstrapDemo,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["datasets"] });
+      queryClient.invalidateQueries({ queryKey: ["live-datasets"] });
       setSelected(data.dataset_id);
     },
   });

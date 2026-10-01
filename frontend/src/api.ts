@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { snapshotDemoDataset, snapshotFor, warmUpLiveApi } from "./demoSnapshot";
+
 const Dataset = z.object({
   schema_version: z.literal("4.0.0"),
   dataset_id: z.string(),
@@ -346,6 +348,8 @@ function getUrl(path: string): string {
 }
 
 async function request<T>(path: string, schema: z.ZodType<T>, init?: RequestInit): Promise<T> {
+  const snapshot = await snapshotFor(init?.method ?? "GET", path);
+  if (snapshot !== undefined) return schema.parse(snapshot);
   const response = await fetch(getUrl(path), init);
   const body: unknown = await response.json();
   if (!response.ok) {
@@ -356,6 +360,8 @@ async function request<T>(path: string, schema: z.ZodType<T>, init?: RequestInit
 }
 
 async function rawRequest<T>(path: string, init?: RequestInit): Promise<T> {
+  const snapshot = await snapshotFor(init?.method ?? "GET", path);
+  if (snapshot !== undefined) return snapshot as T;
   const response = await fetch(getUrl(path), init);
   const body: unknown = await response.json();
   if (!response.ok) {
@@ -457,8 +463,33 @@ const LabelCollectionPlan = z.object({
 export type LabelCollectionPlan = z.infer<typeof LabelCollectionPlan>;
 
 export const api = {
-  bootstrapDemo: () => request("/api/v1/demo/bootstrap", DemoBootstrapResponse, { method: "POST" }),
-  datasets: () => request("/api/v1/datasets", z.array(Dataset)),
+  /** The demo comes from the deployed snapshot when there is one, otherwise from the live API. */
+  bootstrapDemo: async () => {
+    const demo = await snapshotDemoDataset();
+    if (demo) {
+      return DemoBootstrapResponse.parse({
+        status: "ready", dataset_id: demo.dataset_id, dataset_name: demo.dataset_name,
+        dataset_version: demo.dataset_version, is_existing: true,
+      });
+    }
+    return request("/api/v1/demo/bootstrap", DemoBootstrapResponse, { method: "POST" });
+  },
+  /** Available immediately: the snapshot demo, or the live list when no snapshot is deployed. */
+  datasets: async () => {
+    const demo = await snapshotDemoDataset();
+    if (demo) {
+      warmUpLiveApi(API_BASE_URL);
+      return [Dataset.parse(demo)];
+    }
+    return request("/api/v1/datasets", z.array(Dataset));
+  },
+  /** User datasets from the live API (empty without a snapshot, because datasets() has them). */
+  liveDatasets: async () => {
+    const demo = await snapshotDemoDataset();
+    if (!demo) return [];
+    const live = await request("/api/v1/datasets", z.array(Dataset));
+    return live.filter((dataset) => dataset.dataset_name !== demo.dataset_name);
+  },
   summary: (id: string) => request(`/api/v1/datasets/${encodeURIComponent(id)}/summary`, Summary),
   provenance: (id: string) =>
     request(`/api/v1/datasets/${encodeURIComponent(id)}/provenance`, Provenance),
