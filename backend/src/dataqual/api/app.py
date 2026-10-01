@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import datetime
 import json
+from functools import lru_cache
 from typing import Annotated, Any, Literal, cast
 
 from fastapi import FastAPI, File, Form, HTTPException, Query, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from pydantic import ValidationError
 
 from dataqual import __version__
@@ -34,6 +35,9 @@ from dataqual.consensus.models import (
 from dataqual.consensus.service import ConsensusNotFoundError
 from dataqual.descriptive import DescriptiveQueries
 from dataqual.ingestion import ImportLimitError, ImportService
+from dataqual.prioritization.config import DEFAULT_ERV_CONFIG
+from dataqual.prioritization.evidence import RANKING_VERSION, REVIEW_DS_CONFIG, review_features
+from dataqual.prioritization.runs import ReviewRunQuotaError, ReviewRunStore, deterministic_run_id
 from dataqual.schemas.imports import (
     DatasetDetail,
     DatasetSummary,
@@ -41,7 +45,9 @@ from dataqual.schemas.imports import (
     ImportRecord,
     ProvenanceResponse,
 )
+from dataqual.schemas.prioritization import ReviewUnit
 from dataqual.storage import DatasetRepository
+from dataqual.storage.repository import StorageError
 
 Seed = Annotated[int, Query(ge=0)]
 Replicates = Annotated[int, Query(ge=1, le=10_000)]
@@ -99,7 +105,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def bootstrap_demo() -> dict[str, Any]:
         existing_datasets = repository.list_datasets()
         for ds in existing_datasets:
-            if ds.dataset_name == "Synthetic Demo Dataset":
+            if ds.dataset_name == "Synthetic Demo Dataset" and ds.dataset_version == "2.0.0":
                 return {
                     "status": "ready",
                     "dataset_id": ds.dataset_id,
@@ -110,15 +116,21 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
         from dataqual.simulation import SyntheticDatasetGenerator
         from dataqual.simulation.scenarios import get_pre_registered_scenario_config
-        from dataqual.storage.repository import _write_models
 
         cfg = get_pre_registered_scenario_config("S12", world_seed=42)
         generator = SyntheticDatasetGenerator(cfg)
         annos, golds, _hidden_truth = generator.generate()
 
-        lines = ["annotation_id,item_id,annotator_id,label,event_version,annotation_source"]
+        gold_by_item = {g.item_id: g for g in golds}
+        lines = [
+            "annotation_id,item_id,annotator_id,label,event_version,annotation_source,gold_label,gold_source"
+        ]
         for a in annos:
-            lines.append(f"{a.annotation_id},{a.item_id},{a.annotator_id},{a.label},1,human")
+            gold = gold_by_item.get(a.item_id)
+            lines.append(
+                f"{a.annotation_id},{a.item_id},{a.annotator_id},{a.label},1,human,"
+                f"{gold.label if gold else ''},{'simulation_truth' if gold else ''}"
+            )
         csv_bytes = "\n".join(lines).encode("utf-8")
 
         import_cfg = ImportConfig(
@@ -127,7 +139,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             label_domain_id="sentiment_v1",
             labels=["positive", "neutral", "negative"],
             dataset_name="Synthetic Demo Dataset",
-            dataset_version="1.0.0",
+            dataset_version="2.0.0",
             source_uri="synthetic://s12-demo",
             license="CC0-1.0",
             redistribution_allowed=True,
@@ -136,15 +148,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         record = imports.import_bytes("demo_s12.csv", csv_bytes, import_cfg)
         assert record.dataset_id is not None
 
-        if golds:
-            dataset_dir = repository.dataset_root / record.dataset_id
-            _write_models(dataset_dir / "gold_labels.parquet", golds)
-
         return {
             "status": "ready",
             "dataset_id": record.dataset_id,
             "dataset_name": "Synthetic Demo Dataset",
-            "dataset_version": "1.0.0",
+            "dataset_version": "2.0.0",
             "imported_events": record.accepted_rows,
             "imported_golds": len(golds),
             "is_existing": False,
@@ -365,13 +373,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         from dataqual.schemas.core import GoldLabel
 
         all_rows = pq.read_table(path / "annotations.parquet").to_pylist()
-        current_rows = [row for row in all_rows if row.get("is_current", True)]
+        current_rows = [
+            row
+            for row in all_rows
+            if row.get("is_current", True)
+            and row.get("annotation_source") in {"human", "ai_assisted"}
+        ]
         annotations = [
             Annotation(
                 str(row["annotation_id"]),
                 str(row["item_id"]),
                 str(row["annotator_id"]),
                 str(row["label"]),
+                confidence=row.get("confidence"),
             )
             for row in current_rows
         ]
@@ -379,13 +393,24 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         raw_labels = domain_rows[0]["labels"]
         labels = list(json.loads(raw_labels)) if isinstance(raw_labels, str) else list(raw_labels)
         raw_gold = pq.read_table(path / "gold_labels.parquet").to_pylist()
+        latest_gold = {}
+        for row in raw_gold:
+            previous = latest_gold.get(str(row["item_id"]))
+            if previous is None or row["version"] > previous["version"]:
+                latest_gold[str(row["item_id"])] = row
         gold_labels = [
             GoldLabel(
                 gold_label_id=str(row.get("gold_label_id") or f"g-{row['item_id']}"),
                 project_id=detail.project_id,
                 item_id=str(row["item_id"]),
-                label_domain_id="domain",
+                label_domain_id=str(row["label_domain_id"]),
                 label=str(row["label"]) if row.get("label") is not None else None,
+                distribution=(
+                    json.loads(row["distribution"])
+                    if isinstance(row.get("distribution"), str)
+                    else row.get("distribution")
+                ),
+                supersedes_gold_label_id=row.get("supersedes_gold_label_id"),
                 resolution_status=cast(
                     Literal["resolved_hard", "resolved_distributional", "unresolved"],
                     str(row.get("resolution_status") or "resolved_hard"),
@@ -402,7 +427,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 version=int(row.get("version") or 1),
                 created_at=str(row.get("created_at") or "2026-08-09T00:00:00Z"),
             )
-            for row in raw_gold
+            for row in latest_gold.values()
         ]
         return detail, annotations, gold_labels, labels
 
@@ -454,6 +479,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             labels,
             dataset_id,
             detail.project_id,
+            precomputed_features=review_features(annotations, gold_labels, labels),
         )
         features_map = service.extract_all_features()
         return [f.model_dump(mode="json") for f in features_map.values()]
@@ -469,6 +495,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             labels,
             dataset_id,
             detail.project_id,
+            precomputed_features=review_features(annotations, gold_labels, labels),
         )
         features_map = service.extract_all_features()
         if item_id not in features_map:
@@ -491,6 +518,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             labels,
             dataset_id,
             detail.project_id,
+            precomputed_features=review_features(annotations, gold_labels, labels),
         )
         flags = service.generate_quality_flags()
 
@@ -504,26 +532,61 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return [f.model_dump(mode="json") for f in flags]
 
     # Phase 5 Review Prioritization Endpoints
-    review_runs_store: dict[str, dict[str, Any]] = {}
+    review_runs_store = ReviewRunStore(repository.root)
+
+    def review_run_or_404_optional(run_id: str) -> dict[str, Any] | None:
+        try:
+            return review_runs_store.load(run_id)
+        except StorageError as error:
+            raise HTTPException(
+                500, {"code": "storage_error", "message": f"{error}; the run was not modified"}
+            ) from None
+
+    def review_run_or_404(run_id: str) -> dict[str, Any]:
+        run = review_run_or_404_optional(run_id)
+        if run is None:
+            raise HTTPException(404, {"code": "not_found", "message": "review run not found"})
+        return run
 
     @app.post("/api/v1/datasets/{dataset_id}/review-runs")
     def create_review_run(
         dataset_id: str,
-        method: str = "erv",
-        review_unit: str = "annotation",
-        random_ranking_seed: int = 2026,
+        response: Response,
+        method: Literal[
+            "erv",
+            "random",
+            "highest_entropy",
+            "lowest_consensus_confidence",
+            "lowest_worker_reliability",
+        ] = "erv",
+        review_unit: ReviewUnit = "annotation",
+        random_ranking_seed: Seed = 2026,
     ) -> dict[str, Any]:
-        _detail, annotations, gold_labels, labels = load_snapshot_data(dataset_id)
+        detail, annotations, gold_labels, labels = load_snapshot_data(dataset_id)
         from dataqual.prioritization.service import ReviewPrioritizationService
+
+        # Ranking is deterministic in these inputs; the seed only matters for random ranking.
+        identity = {
+            "dataset_id": dataset_id,
+            "canonical_snapshot_checksum": detail.canonical_snapshot_checksum,
+            "method": method,
+            "review_unit": review_unit,
+            "random_ranking_seed": random_ranking_seed if method == "random" else None,
+            "ranking_version": RANKING_VERSION,
+            "erv_config_hash": DEFAULT_ERV_CONFIG.config_hash(),
+            "ds_configuration": REVIEW_DS_CONFIG.model_dump(mode="json"),
+        }
+        run_id = deterministic_run_id(identity)
+        existing = review_run_or_404_optional(run_id)
+        if existing is not None:
+            response.headers["X-Review-Run-Reused"] = "true"
+            return {key: value for key, value in existing.items() if key != "candidates"}
 
         service = ReviewPrioritizationService(annotations, gold_labels, labels)
         candidates = service.get_candidates(
             method=method, review_unit=review_unit, random_ranking_seed=random_ranking_seed
         )
 
-        import uuid
-
-        run_id = f"run-{uuid.uuid4().hex[:12]}"
         run_record = {
             "run_id": run_id,
             "dataset_id": dataset_id,
@@ -531,47 +594,39 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "review_unit": review_unit,
             "total_candidates": len(candidates),
             "created_at": datetime.datetime.now(datetime.UTC).isoformat(),
+            "ranking_version": RANKING_VERSION,
+            "canonical_snapshot_checksum": detail.canonical_snapshot_checksum,
+            "random_ranking_seed": random_ranking_seed,
+            "ds_configuration": REVIEW_DS_CONFIG.model_dump(mode="json"),
+            "erv_config_hash": DEFAULT_ERV_CONFIG.config_hash(),
             "candidates": [c.model_dump(mode="json") for c in candidates],
         }
-        review_runs_store[run_id] = run_record
+        try:
+            review_runs_store.save(run_record)
+        except ReviewRunQuotaError as error:
+            raise HTTPException(429, {"code": "quota_exceeded", "message": str(error)}) from None
 
-        return {
-            "run_id": run_id,
-            "dataset_id": dataset_id,
-            "method": method,
-            "review_unit": review_unit,
-            "total_candidates": len(candidates),
-        }
+        response.headers["X-Review-Run-Reused"] = "false"
+        return {key: value for key, value in run_record.items() if key != "candidates"}
 
     @app.get("/api/v1/review-runs/{run_id}")
     def get_review_run(run_id: str) -> dict[str, Any]:
-        if run_id not in review_runs_store:
-            raise HTTPException(404, {"code": "not_found", "message": "review run not found"})
-        run = review_runs_store[run_id]
-        return {
-            "run_id": run["run_id"],
-            "dataset_id": run["dataset_id"],
-            "method": run["method"],
-            "review_unit": run["review_unit"],
-            "total_candidates": run["total_candidates"],
-            "created_at": run["created_at"],
-        }
+        run = review_run_or_404(run_id)
+        return {key: value for key, value in run.items() if key != "candidates"}
 
     @app.get("/api/v1/review-runs/{run_id}/candidates")
     def get_review_run_candidates(
-        run_id: str, limit: int = 50, offset: int = 0
+        run_id: str,
+        limit: Annotated[int, Query(ge=1, le=500)] = 50,
+        offset: Annotated[int, Query(ge=0)] = 0,
     ) -> list[dict[str, Any]]:
-        if run_id not in review_runs_store:
-            raise HTTPException(404, {"code": "not_found", "message": "review run not found"})
-        run = review_runs_store[run_id]
+        run = review_run_or_404(run_id)
         cands = run["candidates"]
         return cands[offset : offset + limit]
 
     @app.get("/api/v1/review-runs/{run_id}/summary")
     def get_review_run_summary(run_id: str) -> dict[str, Any]:
-        if run_id not in review_runs_store:
-            raise HTTPException(404, {"code": "not_found", "message": "review run not found"})
-        run = review_runs_store[run_id]
+        run = review_run_or_404(run_id)
         return {
             "run_id": run["run_id"],
             "method": run["method"],
@@ -582,13 +637,67 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             ),
         }
 
-    @app.get("/api/v1/benchmark/results")
-    def get_benchmark_results(scenario_id: str = "S1", seeds: int = 5) -> dict[str, Any]:
+    @app.get("/api/v1/review-runs/{run_id}/page")
+    def review_page(
+        run_id: str,
+        limit: Annotated[int, Query(ge=1, le=100)] = 20,
+        offset: Annotated[int, Query(ge=0)] = 0,
+        q: Annotated[str, Query(max_length=200)] = "",
+        eligible_only: bool = False,
+    ) -> dict[str, Any]:
+        run = review_run_or_404(run_id)
+        needle = q.strip().casefold()
+        rows = [
+            c
+            for c in run["candidates"]
+            if (not eligible_only or c["eligible_coverage"])
+            and (
+                not needle
+                or any(
+                    needle in str(c.get(key) or "").casefold()
+                    for key in ("item_id", "annotator_id", "annotation_id", "submitted_label")
+                )
+            )
+        ]
+        return {
+            "items": rows[offset : offset + limit],
+            "total": len(rows),
+            "offset": offset,
+            "limit": limit,
+            "eligible_total": sum(c["eligible_coverage"] for c in run["candidates"]),
+        }
+
+    @app.get("/api/v1/datasets/{dataset_id}/label-collection-plan")
+    def label_collection_plan(
+        dataset_id: str,
+        target_confidence: Annotated[float, Query(ge=0.6, le=0.999)] = 0.95,
+        max_labels: Annotated[int, Query(ge=2, le=15)] = 7,
+        limit: Annotated[int, Query(ge=1, le=1000)] = 200,
+    ) -> dict[str, Any]:
+        """Which items are settled, which need more labels, and which need an expert."""
+        _detail, annotations, _gold, labels = load_snapshot_data(dataset_id)
+        from dataqual.collection import plan_label_collection
+
+        plan = plan_label_collection(annotations, labels, target_confidence, max_labels)
+        plan["items_returned"] = min(limit, len(plan["items"]))
+        plan["items"] = plan["items"][:limit]
+        return plan
+
+    @lru_cache(maxsize=24)
+    def cached_benchmark(scenario_id: str, seeds: int) -> dict[str, Any]:
         from dataqual.benchmarking.runner import BenchmarkRunner
 
-        runner = BenchmarkRunner(scenario_id=scenario_id, seed_count=seeds)
-        manifest, _ = runner.run_benchmark()
+        manifest, _ = BenchmarkRunner(scenario_id=scenario_id, seed_count=seeds).run_benchmark()
         return manifest.model_dump(mode="json")
+
+    @app.get("/api/v1/benchmark/results")
+    def get_benchmark_results(
+        scenario_id: Annotated[str, Query(pattern=r"^S([1-9]|1[0-2])$")] = "S1",
+        seeds: Annotated[int, Query(ge=2, le=20)] = 5,
+    ) -> dict[str, Any]:
+        # Deterministic for (scenario, seeds): serve repeats from a small bounded cache instead
+        # of re-simulating every world on each request.
+        return cached_benchmark(scenario_id, seeds)
 
     return app
 

@@ -1,0 +1,4180 @@
+{
+  "design": {
+    "scenarios": [
+      "S1",
+      "S2",
+      "S3",
+      "S4",
+      "S5",
+      "S6",
+      "S7",
+      "S8",
+      "S9",
+      "S10",
+      "S11",
+      "S12"
+    ],
+    "simulator_version": "1.1.0",
+    "seeds": [
+      100,
+      101,
+      102,
+      103,
+      104
+    ],
+    "targets": [
+      0.95
+    ],
+    "pilot_fraction": 0.3,
+    "minimum_labels_before_stopping": 2,
+    "labels_per_item_override": [
+      7,
+      9
+    ],
+    "scoring": "label correct if in the item's acceptable labels (hidden truth, scoring only)"
+  },
+  "summary": [
+    {
+      "scenario": "S1",
+      "target": 0.95,
+      "adaptive_labels_per_item": 2.9542857142857146,
+      "adaptive_accuracy": 0.9971428571428571,
+      "full_labels_per_item": 7.985714285714286,
+      "full_model_accuracy": 1.0,
+      "full_majority_accuracy": 1.0,
+      "labels_saved_share": 0.6300536672629695
+    },
+    {
+      "scenario": "S2",
+      "target": 0.95,
+      "adaptive_labels_per_item": 5.251428571428571,
+      "adaptive_accuracy": 0.9485714285714286,
+      "full_labels_per_item": 7.985714285714286,
+      "full_model_accuracy": 0.9571428571428571,
+      "full_majority_accuracy": 0.9314285714285715,
+      "labels_saved_share": 0.342397137745975
+    },
+    {
+      "scenario": "S3",
+      "target": 0.95,
+      "adaptive_labels_per_item": 3.765714285714286,
+      "adaptive_accuracy": 0.9914285714285714,
+      "full_labels_per_item": 7.985714285714286,
+      "full_model_accuracy": 0.9971428571428571,
+      "full_majority_accuracy": 0.9885714285714287,
+      "labels_saved_share": 0.5284436493738819
+    },
+    {
+      "scenario": "S4",
+      "target": 0.95,
+      "adaptive_labels_per_item": 3.3200000000000003,
+      "adaptive_accuracy": 0.9857142857142858,
+      "full_labels_per_item": 7.985714285714286,
+      "full_model_accuracy": 0.9885714285714287,
+      "full_majority_accuracy": 0.8714285714285713,
+      "labels_saved_share": 0.5842576028622539
+    },
+    {
+      "scenario": "S5",
+      "target": 0.95,
+      "adaptive_labels_per_item": 3.54,
+      "adaptive_accuracy": 0.9914285714285714,
+      "full_labels_per_item": 7.985714285714286,
+      "full_model_accuracy": 0.9971428571428571,
+      "full_majority_accuracy": 1.0,
+      "labels_saved_share": 0.5567084078711986
+    },
+    {
+      "scenario": "S6",
+      "target": 0.95,
+      "adaptive_labels_per_item": 4.374285714285714,
+      "adaptive_accuracy": 0.9771428571428572,
+      "full_labels_per_item": 7.985714285714286,
+      "full_model_accuracy": 0.9800000000000001,
+      "full_majority_accuracy": 0.9828571428571429,
+      "labels_saved_share": 0.45223613595706624
+    },
+    {
+      "scenario": "S7",
+      "target": 0.95,
+      "adaptive_labels_per_item": 6.017142857142857,
+      "adaptive_accuracy": 0.9371428571428572,
+      "full_labels_per_item": 7.985714285714286,
+      "full_model_accuracy": 0.9371428571428572,
+      "full_majority_accuracy": 0.9285714285714286,
+      "labels_saved_share": 0.24651162790697678
+    },
+    {
+      "scenario": "S8",
+      "target": 0.95,
+      "adaptive_labels_per_item": 3.8285714285714283,
+      "adaptive_accuracy": 0.9914285714285714,
+      "full_labels_per_item": 7.985714285714286,
+      "full_model_accuracy": 0.9971428571428571,
+      "full_majority_accuracy": 1.0,
+      "labels_saved_share": 0.5205724508050089
+    },
+    {
+      "scenario": "S9",
+      "target": 0.95,
+      "adaptive_labels_per_item": 5.788571428571428,
+      "adaptive_accuracy": 0.9228571428571428,
+      "full_labels_per_item": 7.985714285714286,
+      "full_model_accuracy": 0.9228571428571428,
+      "full_majority_accuracy": 0.822857142857143,
+      "labels_saved_share": 0.275134168157424
+    },
+    {
+      "scenario": "S10",
+      "target": 0.95,
+      "adaptive_labels_per_item": 5.025714285714285,
+      "adaptive_accuracy": 0.9542857142857143,
+      "full_labels_per_item": 7.985714285714286,
+      "full_model_accuracy": 0.96,
+      "full_majority_accuracy": 0.9571428571428571,
+      "labels_saved_share": 0.3706618962432917
+    },
+    {
+      "scenario": "S11",
+      "target": 0.95,
+      "adaptive_labels_per_item": 4.32,
+      "adaptive_accuracy": 0.9857142857142858,
+      "full_labels_per_item": 7.985714285714286,
+      "full_model_accuracy": 0.9914285714285714,
+      "full_majority_accuracy": 0.9857142857142858,
+      "labels_saved_share": 0.45903398926654737
+    },
+    {
+      "scenario": "S12",
+      "target": 0.95,
+      "adaptive_labels_per_item": 4.422857142857143,
+      "adaptive_accuracy": 0.9857142857142858,
+      "full_labels_per_item": 7.985714285714286,
+      "full_model_accuracy": 0.9914285714285714,
+      "full_majority_accuracy": 0.9400000000000001,
+      "labels_saved_share": 0.44615384615384623
+    }
+  ],
+  "runs": [
+    {
+      "scenario": "S1",
+      "seed": 100,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 2.9714285714285715,
+        "accuracy": 0.9857142857142858
+      },
+      "full_model": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 1.0
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8571428571428571
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.671428571428572,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.085714285714285,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S1",
+      "seed": 101,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 3.0285714285714285,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 1.0
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.571428571428571,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S1",
+      "seed": 102,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 2.857142857142857,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 1.0
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.6,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.914285714285715,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S1",
+      "seed": 103,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 2.8857142857142857,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 8.1,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.1,
+        "accuracy": 1.0
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.1,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S1",
+      "seed": 104,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 3.0285714285714285,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 1.0
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.9
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.714285714285714,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.042857142857143,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S2",
+      "seed": 100,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 5.3,
+        "accuracy": 0.9714285714285714
+      },
+      "full_model": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 0.9857142857142858
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 0.9
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.6285714285714286
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.7571428571428571
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.7571428571428571
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.8428571428571429
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.671428571428572,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.085714285714285,
+          "accuracy": 0.9857142857142858
+        }
+      ]
+    },
+    {
+      "scenario": "S2",
+      "seed": 101,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 5.0,
+        "accuracy": 0.9285714285714286
+      },
+      "full_model": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 0.9428571428571428
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 0.9428571428571428
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.7857142857142857
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.7714285714285715
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.7714285714285715
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.7857142857142857
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.8428571428571429
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.571428571428571,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 0.9428571428571428
+        }
+      ]
+    },
+    {
+      "scenario": "S2",
+      "seed": 102,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 5.171428571428572,
+        "accuracy": 0.9714285714285714
+      },
+      "full_model": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 0.9714285714285714
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 0.9285714285714286
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.7
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.7857142857142857
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8285714285714286
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.6,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.914285714285715,
+          "accuracy": 0.9714285714285714
+        }
+      ]
+    },
+    {
+      "scenario": "S2",
+      "seed": 103,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 5.185714285714286,
+        "accuracy": 0.9142857142857143
+      },
+      "full_model": {
+        "labels_per_item": 8.1,
+        "accuracy": 0.9142857142857143
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.1,
+        "accuracy": 0.9142857142857143
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.7
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8142857142857143
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.1,
+          "accuracy": 0.9142857142857143
+        }
+      ]
+    },
+    {
+      "scenario": "S2",
+      "seed": 104,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 5.6,
+        "accuracy": 0.9571428571428572
+      },
+      "full_model": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 0.9714285714285714
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 0.9714285714285714
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.6428571428571429
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8142857142857143
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.714285714285714,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.042857142857143,
+          "accuracy": 0.9714285714285714
+        }
+      ]
+    },
+    {
+      "scenario": "S3",
+      "seed": 100,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 3.7285714285714286,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 0.9857142857142858
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.7857142857142857
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8285714285714286
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.671428571428572,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.085714285714285,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S3",
+      "seed": 101,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 3.6285714285714286,
+        "accuracy": 0.9714285714285714
+      },
+      "full_model": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 0.9857142857142858
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 0.9857142857142858
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8142857142857143
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8285714285714286
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.571428571428571,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 0.9857142857142858
+        }
+      ]
+    },
+    {
+      "scenario": "S3",
+      "seed": 102,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 3.657142857142857,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 0.9857142857142858
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8285714285714286
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.6,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.914285714285715,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S3",
+      "seed": 103,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 3.8714285714285714,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 8.1,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.1,
+        "accuracy": 0.9857142857142858
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8285714285714286
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.1,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S3",
+      "seed": 104,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 3.942857142857143,
+        "accuracy": 0.9857142857142858
+      },
+      "full_model": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 1.0
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8285714285714286
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.714285714285714,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.042857142857143,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S4",
+      "seed": 100,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 2.842857142857143,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 0.8571428571428571
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.9
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.671428571428572,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.085714285714285,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S4",
+      "seed": 101,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 2.657142857142857,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 0.8714285714285714
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.571428571428571,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S4",
+      "seed": 102,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 2.5285714285714285,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 0.9
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.6,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.914285714285715,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S4",
+      "seed": 103,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 2.857142857142857,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 8.1,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.1,
+        "accuracy": 0.8142857142857143
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.1,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S4",
+      "seed": 104,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "fallback_assumed_accuracy",
+      "adaptive": {
+        "labels_per_item": 5.714285714285714,
+        "accuracy": 0.9285714285714286
+      },
+      "full_model": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 0.9428571428571428
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 0.9142857142857143
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.6428571428571429
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.6857142857142857
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.6857142857142857
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.7428571428571429
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.7857142857142857
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.8428571428571429
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.714285714285714,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.042857142857143,
+          "accuracy": 0.9428571428571428
+        }
+      ]
+    },
+    {
+      "scenario": "S5",
+      "seed": 100,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 3.5,
+        "accuracy": 0.9857142857142858
+      },
+      "full_model": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 0.9857142857142858
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 1.0
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8285714285714286
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8142857142857143
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.671428571428572,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.085714285714285,
+          "accuracy": 0.9857142857142858
+        }
+      ]
+    },
+    {
+      "scenario": "S5",
+      "seed": 101,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 3.7,
+        "accuracy": 0.9857142857142858
+      },
+      "full_model": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 1.0
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8142857142857143
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.571428571428571,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S5",
+      "seed": 102,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 3.2,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 1.0
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8571428571428571
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.6,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.914285714285715,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S5",
+      "seed": 103,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 3.5,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 8.1,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.1,
+        "accuracy": 1.0
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8428571428571429
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8285714285714286
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.1,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S5",
+      "seed": 104,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "fallback_assumed_accuracy",
+      "adaptive": {
+        "labels_per_item": 3.8,
+        "accuracy": 0.9857142857142858
+      },
+      "full_model": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 1.0
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8142857142857143
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.714285714285714,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.042857142857143,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S6",
+      "seed": 100,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 5.071428571428571,
+        "accuracy": 0.9571428571428572
+      },
+      "full_model": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 0.9571428571428572
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 0.9714285714285714
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.7
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.7571428571428571
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8571428571428571
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.671428571428572,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.085714285714285,
+          "accuracy": 0.9571428571428572
+        }
+      ]
+    },
+    {
+      "scenario": "S6",
+      "seed": 101,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 4.271428571428571,
+        "accuracy": 0.9571428571428572
+      },
+      "full_model": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 0.9714285714285714
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 0.9857142857142858
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8142857142857143
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8428571428571429
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8428571428571429
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.571428571428571,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 0.9714285714285714
+        }
+      ]
+    },
+    {
+      "scenario": "S6",
+      "seed": 102,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "fallback_assumed_accuracy",
+      "adaptive": {
+        "labels_per_item": 4.642857142857143,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 0.9857142857142858
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.6,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.914285714285715,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S6",
+      "seed": 103,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 4.1,
+        "accuracy": 0.9857142857142858
+      },
+      "full_model": {
+        "labels_per_item": 8.1,
+        "accuracy": 0.9857142857142858
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.1,
+        "accuracy": 0.9714285714285714
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.7714285714285715
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.9
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.1,
+          "accuracy": 0.9857142857142858
+        }
+      ]
+    },
+    {
+      "scenario": "S6",
+      "seed": 104,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 3.7857142857142856,
+        "accuracy": 0.9857142857142858
+      },
+      "full_model": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 0.9857142857142858
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 1.0
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.7857142857142857
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8142857142857143
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.714285714285714,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.042857142857143,
+          "accuracy": 0.9857142857142858
+        }
+      ]
+    },
+    {
+      "scenario": "S7",
+      "seed": 100,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 6.057142857142857,
+        "accuracy": 0.9
+      },
+      "full_model": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 0.9
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 0.8857142857142857
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.5714285714285714
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.7142857142857143
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.7857142857142857
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.8428571428571429
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.8428571428571429
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.671428571428572,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.085714285714285,
+          "accuracy": 0.9
+        }
+      ]
+    },
+    {
+      "scenario": "S7",
+      "seed": 101,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 5.757142857142857,
+        "accuracy": 0.9428571428571428
+      },
+      "full_model": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 0.9428571428571428
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 0.9571428571428572
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.7857142857142857
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.7571428571428571
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.7285714285714285
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.7857142857142857
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.571428571428571,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 0.9428571428571428
+        }
+      ]
+    },
+    {
+      "scenario": "S7",
+      "seed": 102,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 5.928571428571429,
+        "accuracy": 0.9285714285714286
+      },
+      "full_model": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 0.9285714285714286
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 0.9428571428571428
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.6428571428571429
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.7142857142857143
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.7428571428571429
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.6,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.914285714285715,
+          "accuracy": 0.9285714285714286
+        }
+      ]
+    },
+    {
+      "scenario": "S7",
+      "seed": 103,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "fallback_assumed_accuracy",
+      "adaptive": {
+        "labels_per_item": 5.614285714285714,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 8.1,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.1,
+        "accuracy": 0.9285714285714286
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.7142857142857143
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.7714285714285715
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8428571428571429
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.8571428571428571
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.1,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S7",
+      "seed": 104,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 6.728571428571429,
+        "accuracy": 0.9142857142857143
+      },
+      "full_model": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 0.9142857142857143
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 0.9285714285714286
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.6
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.6571428571428571
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.7571428571428571
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.8142857142857143
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.714285714285714,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.042857142857143,
+          "accuracy": 0.9142857142857143
+        }
+      ]
+    },
+    {
+      "scenario": "S8",
+      "seed": 100,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 3.9,
+        "accuracy": 0.9714285714285714
+      },
+      "full_model": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 0.9857142857142858
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 1.0
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8428571428571429
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.671428571428572,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.085714285714285,
+          "accuracy": 0.9857142857142858
+        }
+      ]
+    },
+    {
+      "scenario": "S8",
+      "seed": 101,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 3.9285714285714284,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 1.0
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8142857142857143
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.571428571428571,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S8",
+      "seed": 102,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 3.6714285714285713,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 1.0
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8571428571428571
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8428571428571429
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.6,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.914285714285715,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S8",
+      "seed": 103,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 3.7714285714285714,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 8.1,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.1,
+        "accuracy": 1.0
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8285714285714286
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.9
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.1,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S8",
+      "seed": 104,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 3.8714285714285714,
+        "accuracy": 0.9857142857142858
+      },
+      "full_model": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 1.0
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8428571428571429
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.714285714285714,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.042857142857143,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S9",
+      "seed": 100,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 5.6571428571428575,
+        "accuracy": 0.9
+      },
+      "full_model": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 0.9
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 0.8
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.6285714285714286
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.7285714285714285
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8142857142857143
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.8142857142857143
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.8571428571428571
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.671428571428572,
+          "accuracy": 0.9
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.085714285714285,
+          "accuracy": 0.9
+        }
+      ]
+    },
+    {
+      "scenario": "S9",
+      "seed": 101,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 5.328571428571428,
+        "accuracy": 0.9
+      },
+      "full_model": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 0.9
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 0.8428571428571429
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.6285714285714286
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.7
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.7142857142857143
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.7428571428571429
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.8428571428571429
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.8571428571428571
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.571428571428571,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 0.9
+        }
+      ]
+    },
+    {
+      "scenario": "S9",
+      "seed": 102,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 5.857142857142857,
+        "accuracy": 0.9142857142857143
+      },
+      "full_model": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 0.9142857142857143
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 0.8428571428571429
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.6
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.6
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.7142857142857143
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.7571428571428571
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.8428571428571429
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.6,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.914285714285715,
+          "accuracy": 0.9142857142857143
+        }
+      ]
+    },
+    {
+      "scenario": "S9",
+      "seed": 103,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 6.014285714285714,
+        "accuracy": 0.9285714285714286
+      },
+      "full_model": {
+        "labels_per_item": 8.1,
+        "accuracy": 0.9285714285714286
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.1,
+        "accuracy": 0.8
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.6571428571428571
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.7428571428571429
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8571428571428571
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.8571428571428571
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.1,
+          "accuracy": 0.9285714285714286
+        }
+      ]
+    },
+    {
+      "scenario": "S9",
+      "seed": 104,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 6.085714285714285,
+        "accuracy": 0.9714285714285714
+      },
+      "full_model": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 0.9714285714285714
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 0.8285714285714286
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.6142857142857143
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.7428571428571429
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.8285714285714286
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.714285714285714,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.042857142857143,
+          "accuracy": 0.9714285714285714
+        }
+      ]
+    },
+    {
+      "scenario": "S10",
+      "seed": 100,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 5.042857142857143,
+        "accuracy": 0.9285714285714286
+      },
+      "full_model": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 0.9285714285714286
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 0.9571428571428572
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.6571428571428571
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8285714285714286
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8428571428571429
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.671428571428572,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.085714285714285,
+          "accuracy": 0.9285714285714286
+        }
+      ]
+    },
+    {
+      "scenario": "S10",
+      "seed": 101,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 4.857142857142857,
+        "accuracy": 0.9428571428571428
+      },
+      "full_model": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 0.9571428571428572
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 0.9142857142857143
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.7714285714285715
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.7428571428571429
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.7428571428571429
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.7857142857142857
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.571428571428571,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 0.9571428571428572
+        }
+      ]
+    },
+    {
+      "scenario": "S10",
+      "seed": 102,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "fallback_assumed_accuracy",
+      "adaptive": {
+        "labels_per_item": 4.985714285714286,
+        "accuracy": 0.9571428571428572
+      },
+      "full_model": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 0.9571428571428572
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 0.9428571428571428
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.7142857142857143
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.7142857142857143
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8142857142857143
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.6,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.914285714285715,
+          "accuracy": 0.9571428571428572
+        }
+      ]
+    },
+    {
+      "scenario": "S10",
+      "seed": 103,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 5.085714285714285,
+        "accuracy": 0.9571428571428572
+      },
+      "full_model": {
+        "labels_per_item": 8.1,
+        "accuracy": 0.9571428571428572
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.1,
+        "accuracy": 0.9857142857142858
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.7285714285714285
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8571428571428571
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.1,
+          "accuracy": 0.9571428571428572
+        }
+      ]
+    },
+    {
+      "scenario": "S10",
+      "seed": 104,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 5.1571428571428575,
+        "accuracy": 0.9857142857142858
+      },
+      "full_model": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 0.9857142857142858
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.6857142857142857
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.7857142857142857
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.714285714285714,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.042857142857143,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S11",
+      "seed": 100,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 4.285714285714286,
+        "accuracy": 0.9428571428571428
+      },
+      "full_model": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 0.9714285714285714
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 0.9714285714285714
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.7571428571428571
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8428571428571429
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8571428571428571
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.671428571428572,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.085714285714285,
+          "accuracy": 0.9714285714285714
+        }
+      ]
+    },
+    {
+      "scenario": "S11",
+      "seed": 101,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 4.414285714285715,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 0.9857142857142858
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8428571428571429
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.571428571428571,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S11",
+      "seed": 102,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 4.1571428571428575,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 0.9857142857142858
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.7857142857142857
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8285714285714286
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.6,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.914285714285715,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S11",
+      "seed": 103,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 4.442857142857143,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 8.1,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.1,
+        "accuracy": 1.0
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8285714285714286
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.9
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.1,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S11",
+      "seed": 104,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "fallback_assumed_accuracy",
+      "adaptive": {
+        "labels_per_item": 4.3,
+        "accuracy": 0.9857142857142858
+      },
+      "full_model": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 0.9857142857142858
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 0.9857142857142858
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8285714285714286
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.714285714285714,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.042857142857143,
+          "accuracy": 0.9857142857142858
+        }
+      ]
+    },
+    {
+      "scenario": "S12",
+      "seed": 100,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 4.3,
+        "accuracy": 0.9714285714285714
+      },
+      "full_model": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 0.9857142857142858
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.085714285714285,
+        "accuracy": 0.8857142857142857
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.7285714285714285
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8142857142857143
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.671428571428572,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.085714285714285,
+          "accuracy": 0.9857142857142858
+        }
+      ]
+    },
+    {
+      "scenario": "S12",
+      "seed": 101,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 4.4,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.785714285714286,
+        "accuracy": 0.9857142857142858
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.8142857142857143
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8428571428571429
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.8714285714285714
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.571428571428571,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S12",
+      "seed": 102,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 4.514285714285714,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 7.914285714285715,
+        "accuracy": 0.9714285714285714
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.7571428571428571
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8857142857142857
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9285714285714286
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 1.0
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.6,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 7.914285714285715,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "scenario": "S12",
+      "seed": 103,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 4.271428571428571,
+        "accuracy": 0.9571428571428572
+      },
+      "full_model": {
+        "labels_per_item": 8.1,
+        "accuracy": 0.9714285714285714
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.1,
+        "accuracy": 0.9142857142857143
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.7142857142857143
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8571428571428571
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9142857142857143
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9428571428571428
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9571428571428572
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.785714285714286,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.1,
+          "accuracy": 0.9714285714285714
+        }
+      ]
+    },
+    {
+      "scenario": "S12",
+      "seed": 104,
+      "target": 0.95,
+      "evaluated_items": 70,
+      "pilot_items": 30,
+      "model_basis": "dawid_skene_worker_model",
+      "adaptive": {
+        "labels_per_item": 4.628571428571429,
+        "accuracy": 1.0
+      },
+      "full_model": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 1.0
+      },
+      "full_majority_vote": {
+        "labels_per_item": 8.042857142857143,
+        "accuracy": 0.9428571428571428
+      },
+      "fixed_k": [
+        {
+          "k": 1,
+          "labels_per_item": 1.0,
+          "accuracy": 0.7714285714285715
+        },
+        {
+          "k": 2,
+          "labels_per_item": 2.0,
+          "accuracy": 0.8428571428571429
+        },
+        {
+          "k": 3,
+          "labels_per_item": 3.0,
+          "accuracy": 0.9
+        },
+        {
+          "k": 4,
+          "labels_per_item": 4.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 5,
+          "labels_per_item": 5.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 6,
+          "labels_per_item": 6.0,
+          "accuracy": 0.9857142857142858
+        },
+        {
+          "k": 7,
+          "labels_per_item": 7.0,
+          "accuracy": 0.9714285714285714
+        },
+        {
+          "k": 8,
+          "labels_per_item": 7.714285714285714,
+          "accuracy": 1.0
+        },
+        {
+          "k": 9,
+          "labels_per_item": 8.042857142857143,
+          "accuracy": 1.0
+        }
+      ]
+    }
+  ]
+}

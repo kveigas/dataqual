@@ -315,7 +315,7 @@ class DatasetRepository:
         if import_record is None:
             raise StorageError("dataset import manifest is missing")
         checksums = json.loads((path / "artifact_checksums.json").read_text(encoding="utf-8"))
-        git_commit, git_dirty = git_identity(self.root.parent)
+        git_commit, git_dirty = git_identity(Path(__file__).resolve().parent)
         warnings = []
         if git_commit is None:
             warnings.append(

@@ -3,6 +3,8 @@
 > **Research-Grade AI Annotation Quality & Review Prioritization System**  
 > *Release Candidate `v4.0.0-rc1`*
 
+**Local post-RC1 revalidation:** review ranking now consumes actual Dawid–Skene posteriors, and synthetic recovery evaluation excludes development-gold items. Historical RC1 ranking results are not performance claims for this revision. See [the technical reassessment](docs/TECHNICAL_REASSESSMENT.md) for corrections, reproducible checks, and limitations. These changes have not been deployed.
+
 DataQual is an evidence-backed system for preserving, validating, and analyzing crowdsourced and human-in-the-loop annotation data. It combines an immutable storage foundation, agreement statistics (Krippendorff's Alpha), multi-class Dawid–Skene consensus EM, Bayesian worker reliability, disagreement diagnostics, and review queue prioritization.
 
 ## Live Interactive Demo
@@ -23,12 +25,14 @@ Try DataQual v4 live in your browser:
 - **Annotator Intelligence**: Bayesian Beta-Binomial worker reliability and Dirichlet confusion with explicit evidence states (`CREDIBLY_LOW`, `UNCERTAIN`, `NOT_LOW`).
 - **Disagreement Diagnostics**: Evidence-backed heuristic quality flags (`probable_quality_defect`, `probable_ambiguity_policy_issue`, `mixed_evidence`).
 - **Review Prioritization & Simulation**: Decomposable Expected Review Value ($ERV$), 12 controlled synthetic scenarios (S1–S12), and multi-seed budget evaluation (AUREC@20%).
+- **Adaptive Label Collection**: Per-item plan — *settled* (stop labelling), *needs more labels*, or *expert review* for persistent disagreement — from a smoothed Dawid–Skene worker model, with no gold used. Available as an API endpoint and the **Label collection** view.
 
 ## Key Research Findings
 
 - **Real Benchmark Parity**: DataQual reference-compatible Dawid–Skene achieves **100% hard-label parity** against the Crowd-Kit reference benchmark on the Requirements Annotation dataset (`0.00000` gold accuracy difference, posterior MAE $\approx 7.72 \times 10^{-11}$).
 - **Majority Vote vs Dawid–Skene**: Majority Vote achieved `0.79167` gold accuracy vs `0.77083` for Dawid–Skene on the real benchmark, confirming that EM consensus does not automatically beat simple voting when the co-annotation graph is sparse.
-- **Review Efficiency (ERV)**: Expected Review Value ($raw_i = 0.60 u_i + 0.20 h_i + 0.20 e_i$) achieves up to 56.4% error recovery at a 10% review budget in heterogeneous worker scenarios.
+- **Review Efficiency (ERV)**: The fixed heuristic ($raw_i = 0.60 u_i + 0.20 h_i + 0.20 e_i$) remains experimental. The corrected five-seed revalidation does not establish superiority over entropy or worker-reliability baselines. Do not reuse the historical 56.4% claim for the current ranking implementation.
+- **Adaptive Label Collection (synthetic)**: across S1–S12 (5 seeds), stopping at 95% confidence matched full-redundancy accuracy in every scenario while using 0–14% fewer labels at the registered 3–5 labels per item; in an exploratory 7–9 labels-per-item design it used 25–63% fewer labels within 0.8 accuracy points. See `docs/evidence/adaptive-collection*/` and the reassessment addendum (including a discarded overconfident first version).
 
 ## Quick Start & Local Execution
 

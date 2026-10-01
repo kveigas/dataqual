@@ -129,7 +129,7 @@ class AnalysisEngine:
         configuration_hash = sha256_bytes(canonical_json_bytes(configuration))
         run_id = f"analysis_{uuid.uuid4().hex}"
         computed_at = _now()
-        git_commit, git_dirty = git_identity(self.repository.root.parent)
+        git_commit, git_dirty = git_identity(Path(__file__).resolve().parent)
 
         def provenance(method: str) -> AnalysisProvenance:
             return AnalysisProvenance(

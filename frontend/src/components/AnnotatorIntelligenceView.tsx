@@ -55,7 +55,7 @@ export function AnnotatorIntelligenceView({ datasetId }: { datasetId: string }) 
         </label>
       </div>
 
-      <div className="table-wrap">
+      <div className="table-wrap" tabIndex={0} role="region" aria-label="Annotator evidence table">
         <table>
           <caption>Annotator Reliability Profiles (Leave-One-Worker-Out Project Prior)</caption>
           <thead>
@@ -77,11 +77,9 @@ export function AnnotatorIntelligenceView({ datasetId }: { datasetId: string }) 
                 <tr
                   key={p.annotator_id}
                   className={isSelected ? "selected-row" : ""}
-                  onClick={() => setSelectedWorker(p.annotator_id)}
-                  style={{ cursor: "pointer" }}
                 >
                   <th scope="row">
-                    <strong>{p.annotator_id}</strong>
+                    <button className="candidate-button" aria-pressed={isSelected} onClick={() => setSelectedWorker(p.annotator_id)}>{p.annotator_id}</button>
                   </th>
                   <td>{p.total_annotations}</td>
                   <td>{p.evaluated_gold_items}</td>
@@ -144,7 +142,7 @@ export function AnnotatorIntelligenceView({ datasetId }: { datasetId: string }) 
               <p className="method-note">
                 Cell bounds are <em>marginal Beta credible intervals</em> derived from the Dirichlet posterior. Raw counts remain separate from smoothed probabilities.
               </p>
-              <div className="table-wrap">
+              <div className="table-wrap" tabIndex={0} role="region" aria-label="Worker confusion matrix">
                 <table className="confusion">
                   <thead>
                     <tr>

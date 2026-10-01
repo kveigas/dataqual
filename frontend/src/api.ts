@@ -411,8 +411,8 @@ export interface BenchmarkManifestResponse {
       metric_name: string;
       mean_difference: number;
       std_difference: number;
-      ci_lower_95: number;
-      ci_upper_95: number;
+      ci_lower_95: number | null;
+      ci_upper_95: number | null;
       win_count: number;
       tie_count: number;
       loss_count: number;
@@ -430,6 +430,31 @@ const DemoBootstrapResponse = z.object({
   imported_golds: z.number().optional(),
 });
 export type DemoBootstrapResponse = z.infer<typeof DemoBootstrapResponse>;
+
+const LabelCollectionItem = z.object({
+  item_id: z.string(),
+  labels_collected: z.number(),
+  posterior: z.record(z.string(), z.number()),
+  most_likely_label: z.string(),
+  confidence: z.number(),
+  status: z.enum(["confident", "collect_more", "expert_review"]),
+  additional_labels: z.number(),
+});
+const LabelCollectionPlan = z.object({
+  plan_version: z.string(),
+  basis: z.string(),
+  target_confidence: z.number(),
+  max_labels: z.number(),
+  average_annotator_accuracy: z.number(),
+  items_total: z.number(),
+  items_returned: z.number(),
+  status_counts: z.object({ confident: z.number(), collect_more: z.number(), expert_review: z.number() }),
+  labels_collected: z.number(),
+  additional_labels_requested: z.number(),
+  items: z.array(LabelCollectionItem),
+  method: z.array(z.string()),
+});
+export type LabelCollectionPlan = z.infer<typeof LabelCollectionPlan>;
 
 export const api = {
   bootstrapDemo: () => request("/api/v1/demo/bootstrap", DemoBootstrapResponse, { method: "POST" }),
@@ -458,7 +483,7 @@ export const api = {
     { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ methods: ["majority_vote", "dawid_skene"] }) },
   ),
   createReviewRun: (id: string, method = "erv", reviewUnit = "annotation") =>
-    rawRequest<{ run_id: string; total_candidates: number }>(
+    rawRequest<ReviewRun>(
       `/api/v1/datasets/${encodeURIComponent(id)}/review-runs?method=${method}&review_unit=${reviewUnit}`,
       { method: "POST" }
     ),
@@ -466,6 +491,16 @@ export const api = {
     rawRequest<ReviewCandidate[]>(`/api/v1/review-runs/${encodeURIComponent(runId)}/candidates?limit=${limit}&offset=${offset}`),
   getBenchmarkResults: (scenarioId = "S1", seeds = 5) =>
     rawRequest<BenchmarkManifestResponse>(`/api/v1/benchmark/results?scenario_id=${scenarioId}&seeds=${seeds}`),
+  getReviewPage: (runId: string, offset: number, q: string, eligibleOnly: boolean) =>
+    rawRequest<{ items: ReviewCandidate[]; total: number; eligible_total: number }>(
+      `/api/v1/review-runs/${encodeURIComponent(runId)}/page?${new URLSearchParams({ limit: "20", offset: String(offset), q, eligible_only: String(eligibleOnly) })}`),
+  labelCollectionPlan: (id: string, targetConfidence = 0.95, maxLabels = 7) =>
+    request(
+      `/api/v1/datasets/${encodeURIComponent(id)}/label-collection-plan?${new URLSearchParams({
+        target_confidence: String(targetConfidence), max_labels: String(maxLabels), limit: "200",
+      })}`,
+      LabelCollectionPlan,
+    ),
   importFile: (file: File, config: object) => {
     const form = new FormData();
     form.append("file", file);
@@ -473,3 +508,14 @@ export const api = {
     return request("/api/v1/imports", ImportRecord, { method: "POST", body: form });
   },
 };
+
+export interface ReviewRun {
+  run_id: string;
+  dataset_id: string;
+  method: string;
+  review_unit: "annotation" | "item";
+  total_candidates: number;
+  created_at: string;
+  ranking_version: string;
+  canonical_snapshot_checksum: string;
+}

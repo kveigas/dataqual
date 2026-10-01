@@ -6,9 +6,10 @@ import numpy as np
 
 from dataqual.analysis.core import Annotation
 from dataqual.annotators import compute_beta_binomial_reliability
-from dataqual.diagnostics import extract_item_disagreement_features
 from dataqual.prioritization.config import DEFAULT_ERV_CONFIG, ErvConfig
+from dataqual.prioritization.evidence import RANKING_VERSION, review_features
 from dataqual.schemas.core import GoldLabel
+from dataqual.schemas.diagnostics import ItemDisagreementFeatures
 from dataqual.schemas.prioritization import ErvScoreComponents, ReviewCandidate
 
 
@@ -20,23 +21,32 @@ def generate_review_candidates(
     random_ranking_seed: int = 2026,
     erv_cfg: ErvConfig = DEFAULT_ERV_CONFIG,
     review_unit: str = "annotation",
+    *,
+    features: dict[str, ItemDisagreementFeatures] | None = None,
 ) -> list[ReviewCandidate]:
+    if method not in {
+        "random",
+        "highest_entropy",
+        "lowest_consensus_confidence",
+        "lowest_worker_reliability",
+        "erv",
+    }:
+        raise ValueError("unsupported prioritization method")
+    if review_unit not in {"annotation", "item"}:
+        raise ValueError("review_unit must be annotation or item")
+    if random_ranking_seed < 0:
+        raise ValueError("random_ranking_seed must be non-negative")
     candidates: list[ReviewCandidate] = []
     dataset_annotations = list(annotations)
     dataset_golds = list(gold_labels)
 
     # Pre-extract item disagreement features for all items
     item_ids = sorted({a.item_id for a in dataset_annotations})
-    item_features = {
-        item_id: extract_item_disagreement_features(
-            item_id,
-            [a for a in dataset_annotations if a.item_id == item_id],
-            labels,
-            dataset_annotations,
-            dataset_golds,
-        )
-        for item_id in item_ids
-    }
+    item_features = (
+        features
+        if features is not None
+        else review_features(dataset_annotations, dataset_golds, labels)
+    )
 
     # Pre-compute worker gold reliability (development gold only)
     worker_ids = sorted({a.annotator_id for a in dataset_annotations})
@@ -341,4 +351,26 @@ def generate_review_candidates(
                     )
                 )
 
+    for candidate in candidates:
+        feat = item_features[candidate.item_id]
+        candidate.provenance_reference = RANKING_VERSION
+        candidate.contextual_evidence = {
+            "annotation_count": feat.annotation_count,
+            "vote_counts": feat.vote_counts,
+            "ds_status": feat.ds_status,
+            "ds_probabilities": feat.ds_probabilities,
+            "method_disagreement": feat.method_disagreement,
+            "worker_gold_support": {
+                a.annotator_id: worker_gold_reliabilities[a.annotator_id].evaluated_gold_items
+                for a in dataset_annotations
+                if a.item_id == candidate.item_id
+            },
+            "warning": "Disagreement is not proof of error; inspect policy and evidence.",
+        }
+        if method == "erv":
+            candidate.eligible_coverage = feat.ds_status == "success"
+    if method == "erv":
+        candidates.sort(key=lambda c: (not c.eligible_coverage, -c.score, c.candidate_id))
+        for rank, candidate in enumerate(candidates, 1):
+            candidate.rank = rank
     return candidates

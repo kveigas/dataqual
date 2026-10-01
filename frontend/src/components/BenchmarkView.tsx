@@ -5,10 +5,14 @@ import { api, BenchmarkManifestResponse } from "../api";
 export const BenchmarkView: React.FC = () => {
   const [selectedScenario, setSelectedScenario] = useState<string>("S1");
   const [seeds, setSeeds] = useState<number>(5);
+  const [requested, setRequested] = useState<{ scenario: string; seeds: number } | null>(null);
 
   const benchmarkQuery = useQuery({
-    queryKey: ["benchmarkResults", selectedScenario, seeds],
-    queryFn: () => api.getBenchmarkResults(selectedScenario, seeds),
+    queryKey: ["benchmarkResults", requested?.scenario, requested?.seeds],
+    queryFn: () => api.getBenchmarkResults(requested!.scenario, requested!.seeds),
+    enabled: requested !== null,
+    staleTime: Infinity,
+    retry: false,
   });
 
   const manifest = benchmarkQuery.data;
@@ -56,7 +60,10 @@ export const BenchmarkView: React.FC = () => {
         </label>
       </div>
 
-      {benchmarkQuery.isLoading && <p role="status">Running synthetic benchmark simulation...</p>}
+      <button onClick={() => setRequested({ scenario: selectedScenario, seeds })} disabled={benchmarkQuery.isFetching}>Run benchmark</button>
+      <p className="method-note">Synthetic evidence only. Comparisons use paired seeds and a sample-standard-deviation t interval; one seed cannot establish uncertainty. Older RC1 results predate the corrected DS ranking integration.</p>
+      {requested && (requested.scenario !== selectedScenario || requested.seeds !== seeds) && <p className="warning">Showing the last requested benchmark. Run again to apply changed settings.</p>}
+      {benchmarkQuery.isFetching && <p role="status">Running synthetic benchmark simulation...</p>}
       {benchmarkQuery.isError && <p role="alert">Failed to load benchmark results.</p>}
 
       {summary && (
@@ -119,7 +126,7 @@ export const BenchmarkView: React.FC = () => {
                 <tr key={pc.baseline_method} style={{ borderBottom: "1px solid #eee" }}>
                   <td><code>{pc.baseline_method}</code></td>
                   <td>{pc.mean_difference >= 0 ? `+${pc.mean_difference.toFixed(4)}` : pc.mean_difference.toFixed(4)}</td>
-                  <td>[{pc.ci_lower_95.toFixed(4)}, {pc.ci_upper_95.toFixed(4)}]</td>
+                  <td>{pc.ci_lower_95 === null || pc.ci_upper_95 === null ? "Insufficient seeds" : `[${pc.ci_lower_95.toFixed(4)}, ${pc.ci_upper_95.toFixed(4)}]`}</td>
                   <td>
                     <span style={{ color: "green", fontWeight: "bold" }}>{pc.win_count}W</span> /{" "}
                     <span style={{ color: "gray" }}>{pc.tie_count}T</span> /{" "}

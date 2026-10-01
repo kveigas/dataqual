@@ -104,7 +104,7 @@ export function DisagreementDiagnosticsView({ datasetId }: { datasetId: string }
       </div>
 
       {/* Quality Flags Table */}
-      <div className="table-wrap">
+      <div className="table-wrap" tabIndex={0} role="region" aria-label="Quality flags table">
         <table>
           <caption>Generated Quality Flags</caption>
           <thead>
@@ -125,11 +125,9 @@ export function DisagreementDiagnosticsView({ datasetId }: { datasetId: string }
                 <tr
                   key={f.quality_flag_id}
                   className={isSelected ? "selected-row" : ""}
-                  onClick={() => setSelectedEntityId(f.entity_id)}
-                  style={{ cursor: "pointer" }}
                 >
                   <th scope="row">
-                    <code>{f.entity_id}</code>
+                    <button className="candidate-button" aria-pressed={isSelected} onClick={() => setSelectedEntityId(f.entity_id)}>{f.entity_id}</button>
                   </th>
                   <td>
                     <span className="badge">{f.entity_type}</span>
@@ -144,7 +142,7 @@ export function DisagreementDiagnosticsView({ datasetId }: { datasetId: string }
                     <code>{f.recommended_action}</code>
                   </td>
                   <td>{f.support_n}</td>
-                  <td style={{ maxWidth: "300px", whiteSpace: "normal" }}>{f.explanation}</td>
+                  <td style={{ minWidth: "16rem", maxWidth: "24rem", whiteSpace: "normal" }}>{f.explanation}</td>
                 </tr>
               );
             })}
@@ -209,7 +207,7 @@ export function DisagreementDiagnosticsView({ datasetId }: { datasetId: string }
                   </div>
                   <div>
                     <dt>Method Disagreement (MV vs DS)</dt>
-                    <dd>{activeItemDiag.method_disagreement ? "Yes" : "No"}</dd>
+                    <dd>{activeItemDiag.ds_status !== "success" ? "Unavailable — DS not fitted" : activeItemDiag.method_disagreement ? "Yes" : "No"}</dd>
                   </div>
                 </dl>
               </div>

@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from functools import cached_property
 
 from dataqual.analysis.core import Annotation
 from dataqual.prioritization.config import DEFAULT_ERV_CONFIG, ErvConfig
+from dataqual.prioritization.evidence import review_features
 from dataqual.prioritization.methods import generate_review_candidates
 from dataqual.schemas.core import GoldLabel
+from dataqual.schemas.diagnostics import ItemDisagreementFeatures
 from dataqual.schemas.prioritization import ReviewCandidate
 
 
@@ -22,6 +25,10 @@ class ReviewPrioritizationService:
         self.labels = list(labels)
         self.erv_cfg = erv_cfg
 
+    @cached_property
+    def features(self) -> dict[str, ItemDisagreementFeatures]:
+        return review_features(self.annotations, self.gold_labels, self.labels)
+
     def get_candidates(
         self,
         method: str,
@@ -36,6 +43,7 @@ class ReviewPrioritizationService:
             random_ranking_seed=random_ranking_seed,
             erv_cfg=self.erv_cfg,
             review_unit=review_unit,
+            features=self.features,
         )
 
     def get_all_method_candidates(

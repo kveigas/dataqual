@@ -21,7 +21,11 @@ class DisagreementDiagnosticsService:
         dataset_snapshot_id: str,
         project_id: str,
         threshold_config: DiagnosticThresholdConfig = DEFAULT_DIAGNOSTIC_CONFIG,
+        precomputed_features: dict[str, ItemDisagreementFeatures] | None = None,
     ) -> None:
+        # Features that already carry fitted Dawid-Skene evidence (prioritization.evidence);
+        # without them DS fields are reported as unavailable rather than guessed.
+        self.precomputed_features = precomputed_features
         self.annotations = annotations
         self.gold_labels = gold_labels
         self.labels = list(labels)
@@ -37,6 +41,8 @@ class DisagreementDiagnosticsService:
     def extract_all_features(
         self, consensus_run: ConsensusRun | None = None
     ) -> dict[str, ItemDisagreementFeatures]:
+        if consensus_run is None and self.precomputed_features is not None:
+            return self.precomputed_features
         features_map: dict[str, ItemDisagreementFeatures] = {}
         for item_id, item_annos in self.by_item.items():
             feat = extract_item_disagreement_features(

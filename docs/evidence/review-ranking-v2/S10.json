@@ -1,0 +1,137 @@
+{
+  "elapsed_seconds": 0.48825059994123876,
+  "manifest": {
+    "benchmark_run_id": "run-s10-5seeds",
+    "generated_at": "2026-09-29T13:30:05.368421Z",
+    "scenario_id": "S10",
+    "seed_count": 5,
+    "world_seeds": [
+      100,
+      101,
+      102,
+      103,
+      104
+    ],
+    "random_ranking_seeds": [
+      2026,
+      2027,
+      2028,
+      2029,
+      2030
+    ],
+    "erv_config_hash": "e96d9391bf60c858778e7fb960d3e9f8b5aa0ffd7d1e7783e6c6f0d0830ab80e",
+    "methods": [
+      "random",
+      "highest_entropy",
+      "lowest_consensus_confidence",
+      "lowest_worker_reliability",
+      "erv"
+    ],
+    "summary": {
+      "scenario_id": "S10",
+      "review_unit": "annotation",
+      "seed_count": 5,
+      "methods": [
+        "random",
+        "highest_entropy",
+        "lowest_consensus_confidence",
+        "lowest_worker_reliability",
+        "erv"
+      ],
+      "method_aurec_means": {
+        "random": 0.10462393381828554,
+        "highest_entropy": 0.21732514619883042,
+        "lowest_consensus_confidence": 0.17009537155897875,
+        "lowest_worker_reliability": 0.20958522322065326,
+        "erv": 0.21626061902724286
+      },
+      "method_aurec_stds": {
+        "random": 0.016364066477050007,
+        "highest_entropy": 0.015717116577057082,
+        "lowest_consensus_confidence": 0.024276927179581353,
+        "lowest_worker_reliability": 0.04627663771019115,
+        "erv": 0.012064523613198354
+      },
+      "method_precision_10_means": {
+        "random": 0.2923186344238976,
+        "highest_entropy": 0.5374110953058321,
+        "lowest_consensus_confidence": 0.4260312944523471,
+        "lowest_worker_reliability": 0.5163584637268848,
+        "erv": 0.5426742532005691
+      },
+      "method_recall_10_means": {
+        "random": 0.12020396519754672,
+        "highest_entropy": 0.2214346027670803,
+        "lowest_consensus_confidence": 0.17671487662245042,
+        "lowest_worker_reliability": 0.21430551989730423,
+        "erv": 0.22366310084153476
+      },
+      "paired_comparisons": [
+        {
+          "baseline_method": "random",
+          "target_method": "erv",
+          "metric_name": "normalized_aurec_20",
+          "mean_difference": 0.11163668520895735,
+          "std_difference": 0.02783715461623441,
+          "ci_lower_95": 0.07707229250954736,
+          "ci_upper_95": 0.14620107790836734,
+          "win_count": 5,
+          "tie_count": 0,
+          "loss_count": 0
+        },
+        {
+          "baseline_method": "highest_entropy",
+          "target_method": "erv",
+          "metric_name": "normalized_aurec_20",
+          "mean_difference": -0.0010645271715875094,
+          "std_difference": 0.005409765535522195,
+          "ci_lower_95": -0.0077816382757689255,
+          "ci_upper_95": 0.005652583932593906,
+          "win_count": 2,
+          "tie_count": 0,
+          "loss_count": 3
+        },
+        {
+          "baseline_method": "lowest_consensus_confidence",
+          "target_method": "erv",
+          "metric_name": "normalized_aurec_20",
+          "mean_difference": 0.04616524746826415,
+          "std_difference": 0.023316241447002527,
+          "ci_lower_95": 0.017214309890094676,
+          "ci_upper_95": 0.07511618504643362,
+          "win_count": 5,
+          "tie_count": 0,
+          "loss_count": 0
+        },
+        {
+          "baseline_method": "lowest_worker_reliability",
+          "target_method": "erv",
+          "metric_name": "normalized_aurec_20",
+          "mean_difference": 0.00667539580658964,
+          "std_difference": 0.04043056314889826,
+          "ci_lower_95": -0.043525778882501136,
+          "ci_upper_95": 0.05687657049568042,
+          "win_count": 2,
+          "tie_count": 0,
+          "loss_count": 3
+        }
+      ]
+    },
+    "software_version": "4.0.0",
+    "ranking_version": "review-evidence-2.0.0",
+    "ds_configuration": {
+      "profile": "dawid_skene_reference_compatible",
+      "initialization": "raw_majority_vote",
+      "gamma": 0.0,
+      "smoothing_lambda": 0.0,
+      "probability_floor": 1e-10,
+      "max_iterations": 200,
+      "absolute_tolerance": 1e-06,
+      "relative_tolerance": 1e-06,
+      "consecutive_small_improvements": 1,
+      "stopping_rule": "crowdkit_elbo_signed_delta",
+      "component_policy": "global"
+    },
+    "evaluation_scope": "non_development_gold_items_only"
+  }
+}
