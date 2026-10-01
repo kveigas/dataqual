@@ -74,8 +74,9 @@ export function LabelCollectionView({ datasetId }: { datasetId: string }) {
           </div>
           <p className="method-note">
             Average annotator accuracy under the fitted model: {percent(plan.data.average_annotator_accuracy, 1)}.
-            Evidence: on the twelve synthetic scenarios this rule matched full-redundancy accuracy while saving 5–14% of
-            labels at 3–5 labels per item, and 25–63% (within 0.8 points of accuracy) at 7–9 labels per item.
+            Evidence: on the twelve synthetic scenarios at a 95% target, this rule matched full-redundancy accuracy while
+            saving 0–14% of labels at 3–5 labels per item, and 25–63% (within 0.8 points of accuracy) in an exploratory
+            run at 7–9 labels per item.
           </p>
 
           <div className="table-wrap" tabIndex={0} role="region" aria-label="Items needing action">
