@@ -103,7 +103,7 @@ class ConsensusService:
         run_id = f"consensus_{uuid.uuid4().hex}"
         configuration = request.model_dump(mode="json")
         config_hash = sha256_bytes(canonical_json_bytes(configuration))
-        git_commit, git_dirty = git_identity(self.repository.root.parent)
+        git_commit, git_dirty = git_identity(Path(__file__).resolve().parent)
 
         def provenance(method: str) -> AnalysisProvenance:
             return AnalysisProvenance(

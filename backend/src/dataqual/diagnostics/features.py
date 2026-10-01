@@ -46,7 +46,11 @@ def extract_item_disagreement_features(
     vote_margin = float(sorted_props[0] - sorted_props[1]) if len(sorted_props) > 1 else 1.0
 
     # 4. Majority Vote consensus extraction
-    if not sorted_props or (len(sorted_props) > 1 and sorted_props[0] == sorted_props[1]):
+    if (
+        m_i == 0
+        or not sorted_props
+        or (len(sorted_props) > 1 and sorted_props[0] == sorted_props[1])
+    ):
         mv_status = "unresolved"
         mv_label = None
     else:
@@ -62,25 +66,25 @@ def extract_item_disagreement_features(
 
     if consensus_run is not None:
         ds_detail = next(
-            (item for item in consensus_run.comparison.items if item.item_id == item_id), None
-        )
-        if ds_detail is not None and "dawid_skene" in ds_detail.labels:
-            ds_label = ds_detail.labels["dawid_skene"]
-            ds_status = "success" if ds_label is not None else "unresolved"
-
-        fit_diag = next(
-            (fit for fit in consensus_run.convergence if fit.component_id is not None),
+            (
+                item
+                for item in consensus_run.items
+                if item.item_id == item_id and item.method == "dawid_skene"
+            ),
             None,
         )
-        if fit_diag is not None and fit_diag.converged:
-            ds_status = "success"
+        if ds_detail is not None:
+            ds_status = ds_detail.status.value
+            ds_label = ds_detail.label
+            if ds_detail.status == "success" and ds_detail.probabilities:
+                ds_probs = ds_detail.probabilities
+                ds_max_post = max(ds_probs.values())
+                ds_entropy = -math.fsum(p * math.log(p) for p in ds_probs.values() if p > 0)
 
     # 6. Consensus method disagreement
     method_disagreement = False
     if mv_label is not None and ds_label is not None:
         method_disagreement = mv_label != ds_label
-    elif (mv_label is None or ds_label is None) and (m_i >= 2):
-        method_disagreement = True
 
     # 7. Distinct labels emitted & gold status
     distinct_labels_count = len({row.label for row in item_annotations})
@@ -113,6 +117,7 @@ def extract_item_disagreement_features(
         mv_status=mv_status,
         mv_label=mv_label,
         ds_status=ds_status,
+        ds_label=ds_label,
         ds_probabilities=ds_probs,
         ds_max_posterior=ds_max_post,
         ds_entropy=ds_entropy,

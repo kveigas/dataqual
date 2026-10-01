@@ -51,6 +51,7 @@ test("submits a source and reports a successful atomic import", async () => {
     ? new Response(JSON.stringify({ import_id: "imp_1", status: "accepted", dataset_id: "ds_1", input_rows: 3, accepted_rows: 3, rejected_rows: 0, duplicate_identical_occurrences: 0, issues: [] }), { status: 200 })
     : new Response(JSON.stringify([]), { status: 200 }));
   renderApp();
+  fireEvent.click(screen.getByText("Import your annotation data"));
   fireEvent.change(screen.getByLabelText("Source file"), { target: { files: [new File(["a"], "events.csv", { type: "text/csv" })] } });
   fireEvent.click(screen.getByRole("button", { name: "Import atomically" }));
   await waitFor(() => expect(screen.getByText("Import accepted")).toBeVisible());
@@ -62,6 +63,7 @@ test("renders validation rejection without inventing partial success", async () 
     ? new Response(JSON.stringify({ import_id: "imp_2", status: "rejected", dataset_id: null, input_rows: 2, accepted_rows: 0, rejected_rows: 2, duplicate_identical_occurrences: 0, issues: [{ code: "duplicate_annotation_id_conflict", message: "conflicting event" }] }), { status: 200 })
     : new Response(JSON.stringify([]), { status: 200 }));
   renderApp();
+  fireEvent.click(screen.getByText("Import your annotation data"));
   fireEvent.change(screen.getByLabelText("Source file"), { target: { files: [new File(["bad"], "bad.csv")] } });
   fireEvent.click(screen.getByRole("button", { name: "Import atomically" }));
   await waitFor(() => expect(screen.getByText("Import rejected")).toBeVisible());

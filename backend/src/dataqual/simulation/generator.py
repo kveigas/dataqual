@@ -15,11 +15,23 @@ from dataqual.schemas.simulation import (
     WorkerArchetypeConfig,
 )
 
+HONORS_BASE_ACCURACY_FROM = (1, 1, 0)
+
+# Simulator 1.0.0 fixed EXPERT/AVERAGE/WEAK accuracies at 0.95/0.75/0.40 and ignored the
+# configured base_accuracy. Registered RC1 scenarios keep version 1.0.0, so frozen evidence
+# stays bit-identical; configs declaring version >= 1.1.0 get the accuracy they specify.
+LEGACY_ARCHETYPE_ACCURACY = {"EXPERT": 0.95, "AVERAGE": 0.75, "WEAK": 0.40}
+
+
+def _version_tuple(version: str) -> tuple[int, ...]:
+    return tuple(int(part) for part in version.split(".")[:3] if part.isdigit())
+
 
 class SyntheticDatasetGenerator:
     def __init__(self, config: SimulatorConfig) -> None:
         self.config = config
         self.rng = np.random.default_rng(config.simulation_world_seed)
+        self.honors_base_accuracy = _version_tuple(config.version) >= HONORS_BASE_ACCURACY_FROM
 
     def generate(self) -> tuple[list[Annotation], list[GoldLabel], HiddenGroundTruth]:
         K = len(self.config.label_classes)
@@ -48,12 +60,13 @@ class SyntheticDatasetGenerator:
         for w, wa in worker_configs.items():
             if wa.confusion_matrix:
                 cm = np.array(wa.confusion_matrix, dtype=float)
-            elif wa.archetype == "EXPERT":
-                cm = self._build_diagonal_cm(K, 0.95)
-            elif wa.archetype == "AVERAGE":
-                cm = self._build_diagonal_cm(K, 0.75)
-            elif wa.archetype == "WEAK":
-                cm = self._build_diagonal_cm(K, 0.40)
+            elif wa.archetype in LEGACY_ARCHETYPE_ACCURACY:
+                accuracy = (
+                    wa.base_accuracy
+                    if self.honors_base_accuracy
+                    else LEGACY_ARCHETYPE_ACCURACY[wa.archetype]
+                )
+                cm = self._build_diagonal_cm(K, accuracy)
             elif wa.archetype == "RANDOM":
                 cm = np.full((K, K), 1.0 / K)
             elif wa.archetype == "ADVERSARIAL":

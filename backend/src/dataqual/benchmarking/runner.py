@@ -9,6 +9,7 @@ from pydantic import BaseModel
 
 from dataqual.benchmarking.metrics import BenchmarkResult, evaluate_review_candidates
 from dataqual.prioritization.config import DEFAULT_ERV_CONFIG
+from dataqual.prioritization.evidence import RANKING_VERSION, REVIEW_DS_CONFIG
 from dataqual.prioritization.service import ReviewPrioritizationService
 from dataqual.simulation import SyntheticDatasetGenerator
 from dataqual.simulation.scenarios import get_pre_registered_scenario_config
@@ -20,8 +21,8 @@ class PairedComparison(BaseModel):
     metric_name: str
     mean_difference: float
     std_difference: float
-    ci_lower_95: float
-    ci_upper_95: float
+    ci_lower_95: float | None
+    ci_upper_95: float | None
     win_count: int
     tie_count: int
     loss_count: int
@@ -50,6 +51,9 @@ class BenchmarkManifest(BaseModel):
     methods: list[str]
     summary: ScenarioBenchmarkSummary
     software_version: str = "4.0.0"
+    ranking_version: str = RANKING_VERSION
+    ds_configuration: dict[str, Any] = REVIEW_DS_CONFIG.model_dump(mode="json")
+    evaluation_scope: str = "non_development_gold_items_only"
 
 
 class BenchmarkRunner:
@@ -61,6 +65,9 @@ class BenchmarkRunner:
         base_ranking_seed: int = 2026,
         review_unit: str = "annotation",
     ) -> None:
+        if not 1 <= seed_count <= 100:
+            raise ValueError("seed_count must be between 1 and 100")
+        get_pre_registered_scenario_config(scenario_id, world_seed=base_world_seed)
         self.scenario_id = scenario_id
         self.seed_count = seed_count
         self.world_seeds = [base_world_seed + i for i in range(seed_count)]
@@ -91,6 +98,7 @@ class BenchmarkRunner:
 
             labels = list(cfg.label_classes)
             svc = ReviewPrioritizationService(annos, golds, labels)
+            development_items = {gold.item_id for gold in golds}
 
             seed_results: dict[str, BenchmarkResult] = {}
             for m in methods:
@@ -99,6 +107,10 @@ class BenchmarkRunner:
                     review_unit=self.review_unit,
                     random_ranking_seed=r_seed,
                 )
+                # Known gold may train worker reliability, but cannot also count as
+                # held-out recovery evidence. Keep the unsupervised fit transductive.
+                cands = [c for c in cands if c.item_id not in development_items]
+                cands = [c.model_copy(update={"rank": rank}) for rank, c in enumerate(cands, 1)]
                 res = evaluate_review_candidates(cands, hidden_truth)
                 seed_results[m] = res
 
@@ -154,7 +166,7 @@ class BenchmarkRunner:
             base_aurecs = np.array(method_aurecs[base_m])
             diffs = erv_aurecs - base_aurecs
             mean_diff = float(np.mean(diffs))
-            std_diff = float(np.std(diffs))
+            std_diff = float(np.std(diffs, ddof=1)) if self.seed_count > 1 else 0.0
 
             if self.seed_count > 1:
                 se = std_diff / np.sqrt(self.seed_count)
@@ -162,8 +174,8 @@ class BenchmarkRunner:
                 ci_l = float(mean_diff - t_crit * se)
                 ci_u = float(mean_diff + t_crit * se)
             else:
-                ci_l = mean_diff
-                ci_u = mean_diff
+                ci_l = None
+                ci_u = None
 
             wins = int(np.sum(diffs > 1e-6))
             ties = int(np.sum(np.abs(diffs) <= 1e-6))

@@ -35,6 +35,7 @@ class ItemDisagreementFeatures(BaseModel):
     mv_status: str
     mv_label: str | None
     ds_status: str
+    ds_label: str | None = None
     ds_probabilities: dict[str, float] | None = None
     ds_max_posterior: float | None = None
     ds_entropy: float | None = None
