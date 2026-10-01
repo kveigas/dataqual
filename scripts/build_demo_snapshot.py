@@ -1,6 +1,6 @@
 """Pre-compute the public demo's API responses so the static frontend renders instantly.
 
-The hosted API sleeps when idle and takes about a minute to wake. The demo dataset is
+The hosted API sleeps when idle and can take up to a minute to wake. The demo dataset is
 deterministic, so every response the demo views can request is computed here, at build time,
 by the same code that serves the live API, and shipped with the frontend as static JSON.
 The live API is still used for everything else (imports and user datasets).

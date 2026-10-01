@@ -3,7 +3,7 @@
 > **Research-Grade AI Annotation Quality & Review Prioritization System**  
 > *Release Candidate `v4.0.0-rc1`*
 
-**Local post-RC1 revalidation:** review ranking now consumes actual Dawid–Skene posteriors, and synthetic recovery evaluation excludes development-gold items. Historical RC1 ranking results are not performance claims for this revision. See [the technical reassessment](docs/TECHNICAL_REASSESSMENT.md) for corrections, reproducible checks, and limitations. These changes have not been deployed.
+**Local post-RC1 revalidation:** review ranking now consumes actual Dawid–Skene posteriors, and synthetic recovery evaluation excludes development-gold items. Historical RC1 ranking results are not performance claims for this revision. See [the technical reassessment](docs/TECHNICAL_REASSESSMENT.md) for corrections, reproducible checks, and limitations. These changes were released to the live demo on 1 October 2026.
 
 DataQual is an evidence-backed system for preserving, validating, and analyzing crowdsourced and human-in-the-loop annotation data. It combines an immutable storage foundation, agreement statistics (Krippendorff's Alpha), multi-class Dawid–Skene consensus EM, Bayesian worker reliability, disagreement diagnostics, and review queue prioritization.
 
@@ -13,7 +13,8 @@ Try DataQual v4 live in your browser:
 **https://kveigas.github.io/dataqual/**
 
 - **Deterministic Synthetic Demo**: Click **Explore Demo Dataset** to instantly bootstrap and analyze a 100-item, 12-annotator synthetic environment (Scenario S12, seed 42).
-- **Genuine Analytics Engine**: All agreement metrics, Dawid–Skene consensus, annotator intelligence profiles, quality flags, and review prioritization queues are computed live by the DataQual API service.
+- **Genuine Analytics Engine**: All agreement metrics, Dawid–Skene consensus, annotator intelligence profiles, quality flags, and review prioritization queues are computed by the DataQual analysis engine: live by the API service for uploaded datasets and, for the demo dataset, at deploy time.
+- **Instant Start**: The API runs on a free tier that sleeps when idle (up to a minute to wake). The demo's responses are therefore pre-computed during the site build by the same code, from the same deterministic dataset, and shipped with the page, so the demo opens immediately; imports and uploaded datasets use the live API.
 - **Synthetic Benchmark Research**: Synthetic simulation benchmark metrics (AUREC@20%) compare prioritization strategies under controlled ground truth.
 - **Data Isolation**: User-uploaded CSV/JSON datasets remain strictly isolated from demo fixtures.
 
