@@ -6,9 +6,9 @@ below a target confidence (Welinder & Perona 2010; Khetan & Oh, NeurIPS 2016), a
 that stay contested after many labels to expert review instead of buying more votes, because
 persistent disagreement is often genuine human label variation rather than error.
 
-The worker model is a Dawid-Skene fit (reference-compatible profile). Posteriors combine
-each observed label through that worker's confusion row; unseen workers use the
-label-weighted average confusion. No gold or hidden truth is used for planning.
+The worker model is a Dawid-Skene fit (smoothed profile, see COLLECTION_DS_CONFIG).
+Posteriors combine each observed label through that worker's confusion row; unseen workers
+use the label-weighted average confusion. No gold or hidden truth is used for planning.
 """
 
 from __future__ import annotations
