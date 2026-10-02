@@ -105,11 +105,21 @@ function DatasetView({ dataset }: { dataset: Dataset }) {
   return <div className="dataset-detail">
     <div className="metrics" aria-label="Evidence overview">{metrics.map(([label, value, explanation]) => <div className="metric" key={label} title={String(explanation)}><strong>{value}</strong><span>{label}</span></div>)}</div>
     
-    <div className="tabs" role="tablist" aria-label="Dataset views">
+    <div className="tabs" role="tablist" aria-label="Dataset views" onKeyDown={(event) => {
+      // WAI-ARIA tabs: arrows, Home and End move and select; only the selected tab is a Tab stop.
+      const index = VIEWS.findIndex((view) => view.id === activeTab);
+      const next = { ArrowRight: index + 1, ArrowLeft: index - 1, Home: 0, End: VIEWS.length - 1 }[event.key];
+      if (next === undefined) return;
+      event.preventDefault();
+      const view = VIEWS[(next + VIEWS.length) % VIEWS.length];
+      setActiveTab(view.id);
+      document.getElementById(`tab-${view.id}`)?.focus();
+    }}>
       {VIEWS.map((view) => (
         <button
           key={view.id} type="button" role="tab" id={`tab-${view.id}`}
           aria-selected={activeTab === view.id} aria-controls="dataset-panel"
+          tabIndex={activeTab === view.id ? 0 : -1}
           className={`tab-button ${activeTab === view.id ? "active" : ""}`}
           onClick={() => setActiveTab(view.id)}
         >
