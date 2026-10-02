@@ -91,4 +91,19 @@ test("shows evidence, support, agreement, gold diagnostics, and provenance", asy
   expect(screen.getByRole("heading", { name: "Gold performance" })).toBeVisible();
   expect(screen.getByText(/rows are authoritative gold/i)).toBeVisible();
   expect(screen.getByText("analysis_1")).toBeVisible();
+
+  // Tabs follow the WAI-ARIA pattern: one Tab stop, arrows/Home/End move and select (wrapping).
+  const tabs = screen.getAllByRole("tab");
+  expect(tabs.filter((tab) => tab.tabIndex === 0)).toEqual([tabs[0]]);
+  fireEvent.keyDown(tabs[0], { key: "ArrowRight" });
+  expect(screen.getByRole("tab", { name: "Label collection" })).toHaveAttribute("aria-selected", "true");
+  expect(document.activeElement).toBe(screen.getByRole("tab", { name: "Label collection" }));
+  expect(window.location.hash).toBe("#view=collection");
+  fireEvent.keyDown(document.activeElement!, { key: "End" });
+  expect(screen.getByRole("tab", { name: "Benchmarks" })).toHaveAttribute("aria-selected", "true");
+  fireEvent.keyDown(document.activeElement!, { key: "ArrowRight" });
+  expect(screen.getByRole("tab", { name: "Coverage & agreement" })).toHaveAttribute("aria-selected", "true");
+  fireEvent.keyDown(document.activeElement!, { key: "ArrowLeft" });
+  fireEvent.keyDown(document.activeElement!, { key: "Home" });
+  expect(screen.getByRole("tab", { name: "Coverage & agreement" })).toHaveAttribute("aria-selected", "true");
 });
